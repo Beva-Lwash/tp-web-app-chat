@@ -1,5 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { UserCredentials } from "../model/user-credentials";
+import { AuthenticationService } from "../authentication.service";
 
 @Component({
   selector: "app-login-page",
@@ -7,11 +8,11 @@ import { UserCredentials } from "../model/user-credentials";
   styleUrls: ["./login-page.component.css"],
 })
 export class LoginPageComponent implements OnInit {
-  constructor() {}
+  constructor(private authenticate: AuthenticationService) {}
 
   ngOnInit(): void {}
 
   onLogin(UserCredentials: UserCredentials) {
-    // À faire
+    this.authenticate.getUsername();
   }
 }
