@@ -20,7 +20,7 @@ export class AuthenticationService {
   }
 
   logout() {
-    
+    localStorage.clear();
   }
 
   getUsername(): Observable<string | null> {
