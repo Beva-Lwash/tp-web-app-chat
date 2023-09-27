@@ -15,11 +15,12 @@ export class AuthenticationService {
   }
 
   login(userCredentials: UserCredentials) {
-    // À faire
+    localStorage.setItem(AuthenticationService.KEY,userCredentials.username);
+    this.username.next(localStorage.getItem(AuthenticationService.KEY));
   }
 
   logout() {
-    // À faire
+    
   }
 
   getUsername(): Observable<string | null> {
