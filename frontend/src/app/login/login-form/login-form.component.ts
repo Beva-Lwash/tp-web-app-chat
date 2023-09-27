@@ -21,6 +21,6 @@ export class LoginFormComponent implements OnInit {
   ngOnInit(): void {}
 
   onLogin() {
-    // À faire
+    this.login.emit();
   }
 }
