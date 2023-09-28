@@ -13,6 +13,6 @@ export class LoginPageComponent implements OnInit {
   ngOnInit(): void {}
 
   onLogin(UserCredentials: UserCredentials) {
-    this.authenticate.getUsername();
-  }
+    
+    }
 }
