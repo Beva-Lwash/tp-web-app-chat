@@ -8,11 +8,16 @@ import { AuthenticationService } from "../authentication.service";
   styleUrls: ["./login-page.component.css"],
 })
 export class LoginPageComponent implements OnInit {
-  constructor(private authenticate: AuthenticationService) {}
+  constructor(private authenticate: AuthenticationService) {
+    this.authenticate;
+  } 
 
   ngOnInit(): void {}
 
   onLogin(UserCredentials: UserCredentials) {
-    this.authenticate.getUsername();
+    this.authenticate.login(UserCredentials);
+    console.log(UserCredentials.username);
+    console.log(UserCredentials.password);
+    //this.router.navigate(['/','chat']);
     }
 }

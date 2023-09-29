@@ -10,11 +10,13 @@ export class AuthenticationService {
 
   private username = new BehaviorSubject<string | null>(null);
 
-  constructor() {
-    this.username.next(localStorage.getItem(AuthenticationService.KEY));
+  constructor(){
+    localStorage.getItem(AuthenticationService.KEY);
   }
+  
 
   login(userCredentials: UserCredentials) {
+    console.log()
     localStorage.setItem(AuthenticationService.KEY,userCredentials.username);
     this.username.next(localStorage.getItem(AuthenticationService.KEY));
   }
