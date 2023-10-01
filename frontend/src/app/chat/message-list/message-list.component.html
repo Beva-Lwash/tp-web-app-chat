@@ -1,4 +1,4 @@
-<div  class="message-list">
+<div  #chatContainer class="message-list">
     <div *ngFor="let m of messages; let i = index">
       <h3 *ngIf="showDateHeader(messages, i)">
         {{ m.timestamp | date }}
