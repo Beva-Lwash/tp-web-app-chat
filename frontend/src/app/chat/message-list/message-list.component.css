@@ -1,0 +1,7 @@
+.message-list {
+    height: 70vh;
+    overflow-y: scroll;
+    text-align: left;
+    padding: 30px;
+  }
+  
