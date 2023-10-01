@@ -4,8 +4,8 @@ import { AuthenticationService } from "src/app/login/authentication.service";
 import { Message } from "../message.model";
 import { MessagesService } from "../messages.service";
 import { FormBuilder } from "@angular/forms";
+//A ajouter
 import { Router } from "@angular/router";
-
 
 @Component({
   selector: "app-chat-page",
@@ -23,23 +23,27 @@ export class ChatPageComponent implements OnInit, OnDestroy {
   username: string | null = null;
   usernameSubscription: Subscription;
 
-  messages: Message[] = [];
+  //A faire
+  messages: Message[] | null = [];
   messagesSubscription: Subscription;
+  
 
   constructor(
     private fb: FormBuilder,
     private messagesService: MessagesService,
     private authenticationService: AuthenticationService,
+    //A ajouter
     private router: Router
-
   ) {
     this.usernameSubscription = this.username$.subscribe((u) => {
-      this.username = u;
-      
+      this.username = u;  
+    if (this.username == '') 
+      this.router.navigate(['']);
     });
     //A ajouter
     this.messagesSubscription = this.messages$.subscribe((m) => {
       this.messages = m;
+    
     });
   }
 
@@ -48,35 +52,20 @@ export class ChatPageComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     if (this.usernameSubscription) {
       this.usernameSubscription.unsubscribe();
-      this.messagesSubscription.unsubscribe();
     }
+    //A faire 
+    if(this.messagesSubscription)
+      this.messagesSubscription.unsubscribe();
   }
-
-  onPublishMessage() {
-    if (this.username && this.messageForm.valid && this.messageForm.value.msg) {
+  onPublishMessage(msg: string) {
+    if (this.username && msg) {
       this.messagesService.postMessage({
-        text: this.messageForm.value.msg,
+        text: msg,
         username: this.username,
         timestamp: Date.now(),
       });
     }
-    this.messageForm.reset();
   }
-
-  /** Afficher la date seulement si la date du message précédent est différente du message courant. */
-  showDateHeader(messages: Message[] | null, i: number) {
-    if (messages != null) {
-      if (i === 0) {
-        return true;
-      } else {
-        const prev = new Date(messages[i - 1].timestamp).setHours(0, 0, 0, 0);
-        const curr = new Date(messages[i].timestamp).setHours(0, 0, 0, 0);
-        return prev != curr;
-      }
-    }
-    return false;
-  }
-
   onLogout() {
     // À faire
     this.authenticationService.logout();
