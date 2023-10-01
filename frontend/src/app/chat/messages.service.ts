@@ -12,6 +12,9 @@ export class MessagesService {
 
   postMessage(message: Message): void {
     // À faire
+    const newMessage = this.messages.value;
+    newMessage.push(message);
+    this.messages.next([...newMessage]);   
   }
 
   getMessages(): Observable<Message[]> {
