@@ -1,1 +1,10 @@
-<p>message-list works!</p>
+<div  class="message-list">
+    <div *ngFor="let m of messages; let i = index">
+      <h3 *ngIf="showDateHeader(messages, i)">
+        {{ m.timestamp | date }}
+      </h3>
+      <p>
+        [{{ m.timestamp | date : "hh:mm" }}] {{ m.username }} : {{ m.text }}
+      </p>
+    </div>
+  </div>
