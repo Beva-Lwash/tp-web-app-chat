@@ -1,6 +1,8 @@
 import { Injectable } from "@angular/core";
 import { BehaviorSubject, Observable } from "rxjs";
 import { UserCredentials } from "./model/user-credentials";
+import { Router } from "@angular/router";
+
 
 @Injectable({
   providedIn: "root",
@@ -10,19 +12,23 @@ export class AuthenticationService {
 
   private username = new BehaviorSubject<string | null>(null);
 
-  constructor(){
-    localStorage.getItem(AuthenticationService.KEY);
+  constructor(private router: Router){
+    this.username.next(localStorage.getItem(AuthenticationService.KEY));
   }
   
 
   login(userCredentials: UserCredentials) {
-    console.log()
-    localStorage.setItem(AuthenticationService.KEY,userCredentials.username);
-    this.username.next(localStorage.getItem(AuthenticationService.KEY));
+    // À faire
+    const {username} = userCredentials;
+    localStorage.setItem(AuthenticationService.KEY, username);
+    this.username.next(username);
+    this.router.navigate(["/chat"]);
   }
 
   logout() {
-    localStorage.clear();
+    // À faire
+    localStorage.removeItem(AuthenticationService.KEY);
+    this.username.next(null);
   }
 
   getUsername(): Observable<string | null> {
