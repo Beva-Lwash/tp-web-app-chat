@@ -48,9 +48,7 @@ export class ChatPageComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     if (this.usernameSubscription) {
       this.usernameSubscription.unsubscribe();
-      //A faire 
-    if(this.messagesSubscription)
-    this.messagesSubscription.unsubscribe();
+      this.messagesSubscription.unsubscribe();
     }
   }
 
