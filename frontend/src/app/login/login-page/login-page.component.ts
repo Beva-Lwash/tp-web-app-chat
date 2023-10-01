@@ -16,6 +16,6 @@ export class LoginPageComponent implements OnInit {
 
   onLogin(UserCredentials: UserCredentials) {
     // À faire
-    this.authService.login(UserCredentials);
+    this.authenticate.login(UserCredentials);
     }
 }
