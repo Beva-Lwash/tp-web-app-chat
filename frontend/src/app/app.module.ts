@@ -9,6 +9,7 @@ import { LoginFormComponent } from "./login/login-form/login-form.component";
 import { ChatPageComponent } from "./chat/chat-page/chat-page.component";
 import { NewMessageFormComponent } from './chat/new-message-form/new-message-form.component';
 import { MessageListComponent } from './chat/message-list/message-list.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   declarations: [
@@ -19,7 +20,7 @@ import { MessageListComponent } from './chat/message-list/message-list.component
     NewMessageFormComponent,
     MessageListComponent,
   ],
-  imports: [BrowserModule, AppRoutingModule, ReactiveFormsModule],
+  imports: [BrowserModule, AppRoutingModule, ReactiveFormsModule, BrowserAnimationsModule],
   providers: [],
   bootstrap: [AppComponent],
 })
