@@ -7,6 +7,8 @@ import { UserCredentials } from "../model/user-credentials";
   templateUrl: "./login-form.component.html",
   styleUrls: ["./login-form.component.css"],
 })
+
+
 export class LoginFormComponent implements OnInit {
   loginForm = this.fb.group({
     username: "",
@@ -26,4 +28,8 @@ export class LoginFormComponent implements OnInit {
     if(this.loginForm.valid)
       this.login.emit(<UserCredentials>this.loginForm.value);    
   }
+
+
+  hide = true;
 }
+

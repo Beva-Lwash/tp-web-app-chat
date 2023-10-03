@@ -6,10 +6,16 @@
         <input name="username" type="text" formControlName="username" />
       </div>
       <div>
-        <label>Mot de passe: </label>
-        <input name="password" type="password" formControlName="password" />
+        <mat-form-field>
+          <mat-label>Mot de passe</mat-label>
+          <input name="password" formControlName="password" matInput [type]="hide ? 'password' : 'text'">
+          <button mat-icon-button matSuffix (click)="hide = !hide" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide">
+            <mat-icon>{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
+          </button>
+        </mat-form-field>
       </div>
     </div>
-    <div><button type="submit">Connexion</button></div>
+    <div>
+      <button type="submit" mat-raised-button color="primary">Connexion</button></div>
   </form>
 </div>
