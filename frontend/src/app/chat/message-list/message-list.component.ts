@@ -12,10 +12,6 @@ export class MessageListComponent implements  OnInit, AfterViewChecked {
     | ElementRef
     | any;
 
-
-
-    
-
     ngOnInit(): void {
       this.scrollToBottom();
     }
