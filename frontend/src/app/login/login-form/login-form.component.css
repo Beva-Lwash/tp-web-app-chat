@@ -3,3 +3,11 @@
   flex-direction: column;
   align-items: center;
 }
+.utilisateur {
+  padding: 5px;
+
+}
+.motDePasse {
+  padding: 5px;
+
+}

@@ -1,6 +1,6 @@
 <div class="chat">
   <div class="chat-logout-button">
-    <button (click)="onLogout()">Quitter</button>
+    <button  mat-raised-button color="warn" (click)="onLogout()">Déconnexion</button>
   </div>
   <div class="chat-messages">
     <app-message-list [messages]="messages"></app-message-list>

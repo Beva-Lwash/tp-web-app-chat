@@ -1,4 +1,9 @@
 <form (ngSubmit)="onPublishMessage()" [formGroup]="messageForm">
-    <input name="message" type="text" formControlName="msg" />
-    <button type="submit">></button>
-</form>
+    <mat-form-field class="mff">
+      <mat-label>Entrez votre message</mat-label>
+      <input matInput name="message" type="text" formControlName="msg" />
+      <button mat-icon-button matSuffix color="primary"  type="submit">
+          <mat-icon> send </mat-icon>
+       </button>
+   </mat-form-field>
+  </form>

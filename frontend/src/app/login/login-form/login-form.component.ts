@@ -29,7 +29,5 @@ export class LoginFormComponent implements OnInit {
       this.login.emit(<UserCredentials>this.loginForm.value);    
   }
 
-
-  hide = true;
 }
 
