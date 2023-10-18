@@ -2,6 +2,7 @@ package com.inf5190.chat.auth;
 
 import javax.servlet.http.Cookie;
 
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
@@ -32,10 +33,11 @@ public class AuthController {
     @PostMapping(AUTH_LOGIN_PATH)
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest) {
         SessionData s = new SessionData(loginRequest.username());
-        LoginResponse l = new LoginResponse(this.sessionManager.addSession(s));
-        ResponseCookie cookie = ResponseCookie.from(SESSION_ID_COOKIE_NAME, AUTH_LOGIN_PATH).httpOnly(true).secure(true)
+        String sessionId = this.sessionManager.addSession(s);
+        LoginResponse l = new LoginResponse(loginRequest.username());
+        ResponseCookie cookie = ResponseCookie.from(SESSION_ID_COOKIE_NAME, sessionId).httpOnly(true).secure(true)
                 .path("/").maxAge(86400).build();
-        return ResponseEntity.ok().header("SET_COOKIE", cookie.toString()).body(l);
+        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString()).body(l);
     }
 
     @PostMapping(AUTH_LOGOUT_PATH)
