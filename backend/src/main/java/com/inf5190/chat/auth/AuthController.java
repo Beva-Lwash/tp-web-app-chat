@@ -42,7 +42,8 @@ public class AuthController {
 
     @PostMapping(AUTH_LOGOUT_PATH)
     public ResponseEntity<Void> logout(@CookieValue("sid") Cookie sessionCookie) {
-
-        return null;
+        this.sessionManager.removeSession(sessionCookie.getValue());
+        ResponseCookie cookie_vide = ResponseCookie.from(SESSION_ID_COOKIE_NAME, "").maxAge(0).build();
+        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie_vide.toString()).build();
     }
 }
