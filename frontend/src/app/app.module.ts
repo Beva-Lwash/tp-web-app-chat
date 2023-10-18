@@ -13,6 +13,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon'; 
 import { MatInputModule } from '@angular/material/input';
+import { HttpClientModule }from "@angular/common/http";
 
 @NgModule({
   declarations: [
@@ -24,7 +25,7 @@ import { MatInputModule } from '@angular/material/input';
     MessageListComponent,
   ],
   imports: [BrowserModule, AppRoutingModule, ReactiveFormsModule, BrowserAnimationsModule, MatButtonModule
-  ,MatFormFieldModule, MatIconModule, MatInputModule],
+  ,MatFormFieldModule, MatIconModule, MatInputModule, HttpClientModule],
   providers: [],
   bootstrap: [AppComponent],
 })
