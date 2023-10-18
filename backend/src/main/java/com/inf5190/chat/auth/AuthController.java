@@ -2,6 +2,7 @@ package com.inf5190.chat.auth;
 
 import javax.servlet.http.Cookie;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.inf5190.chat.auth.model.LoginRequest;
 import com.inf5190.chat.auth.model.LoginResponse;
+import com.inf5190.chat.auth.session.SessionData;
 import com.inf5190.chat.auth.session.SessionManager;
 
 /**
@@ -29,8 +31,9 @@ public class AuthController {
 
     @PostMapping(AUTH_LOGIN_PATH)
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest) {
-        // À faire...
-        return null;
+        SessionData s = new SessionData(loginRequest.username());
+        LoginResponse l = new LoginResponse(this.sessionManager.addSession(s));
+        return new ResponseEntity<LoginResponse>(l, HttpStatus.OK);
     }
 
     @PostMapping(AUTH_LOGOUT_PATH)
