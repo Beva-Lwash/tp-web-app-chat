@@ -1,9 +1,16 @@
 package com.inf5190.chat.messages;
 
 import com.inf5190.chat.auth.session.SessionDataAccessor;
+import com.inf5190.chat.messages.model.Message;
 import com.inf5190.chat.messages.repository.MessageRepository;
 import com.inf5190.chat.websocket.WebSocketManager;
 
+import java.util.List;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -23,5 +30,14 @@ public class MessageController {
         this.webSocketManager = webSocketManager;
     }
 
-    // À faire...
+    @GetMapping(MESSAGES_PATH)
+    public ResponseEntity<List<Message>> get_MessageRepository(@RequestBody List<Message> messages) {
+        long randomid = 0;
+        return ResponseEntity.ok().body(messageRepository.getMessages(randomid));
+    }
+
+    @PostMapping(MESSAGES_PATH)
+    public ResponseEntity<Message> creer_message(@RequestBody Message message) {
+        return ResponseEntity.ok().body(this.messageRepository.createMessage(message));
+    }
 }
