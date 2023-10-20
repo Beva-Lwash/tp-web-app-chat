@@ -35,7 +35,12 @@ export class AuthenticationService {
     this.router.navigate(["/chat"]);
   }
 
-  logout() {
+  async logout() {
+    await firstValueFrom(
+      this.httpClient.post<LoginResponse>(`${environment.backendUrl}/auth/logout`,null,
+    { withCredentials: true }
+    ))
+    ;
     localStorage.removeItem(AuthenticationService.KEY);
     this.username.next(null);
   }
