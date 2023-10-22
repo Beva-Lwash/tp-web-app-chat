@@ -24,7 +24,6 @@ export class LoginFormComponent implements OnInit {
 
 
   onLogin() {
-    //À faire 
     if(this.loginForm.valid)
       this.login.emit(<UserCredentials>this.loginForm.value);    
   }

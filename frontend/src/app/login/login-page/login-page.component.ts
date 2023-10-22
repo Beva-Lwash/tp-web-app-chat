@@ -15,7 +15,6 @@ export class LoginPageComponent implements OnInit {
   ngOnInit(): void {}
 
   onLogin(UserCredentials: UserCredentials) {
-    // À faire
     this.authenticate.login(UserCredentials);
     }
 }

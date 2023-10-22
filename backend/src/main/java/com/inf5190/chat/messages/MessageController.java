@@ -31,13 +31,13 @@ public class MessageController {
     }
 
     @GetMapping(MESSAGES_PATH)
-    public ResponseEntity<List<Message>> get_MessageRepository(@RequestBody List<Message> messages) {
-        long randomid = 0;
-        return ResponseEntity.ok().body(messageRepository.getMessages(randomid));
+    public List<Message> get_MessageRepository() {
+        return messageRepository.getMessages(null);
     }
 
     @PostMapping(MESSAGES_PATH)
-    public ResponseEntity<Message> creer_message(@RequestBody Message message) {
-        return ResponseEntity.ok().body(this.messageRepository.createMessage(message));
+    public Message creer_message(@RequestBody Message message) {
+        Message newMessage = messageRepository.createMessage(message);
+        return newMessage;
     }
 }

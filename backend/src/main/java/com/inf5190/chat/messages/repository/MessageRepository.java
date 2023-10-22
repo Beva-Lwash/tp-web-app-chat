@@ -23,7 +23,7 @@ public class MessageRepository {
     }
 
     public Message createMessage(Message message) {
-        messages.add(messages.size() - 1, message);
+        messages.add(message);
         return message;
     }
 

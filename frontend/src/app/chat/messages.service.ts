@@ -15,7 +15,8 @@ export class MessagesService {
   postMessage(message: Message): void {
     const newMessage = this.messages.value;
     newMessage.push(message);
-    this.messages.next([...newMessage]);   
+    this.messages.next([...newMessage]); 
+    this.HttpClient.post(`${environment.backendUrl}/messages`,this.messages,{withCredentials: true}) ;
   }
 
   getMessages(): Observable<Message[]> {
@@ -24,7 +25,6 @@ export class MessagesService {
 
   fetchMessages(): void{
     this.HttpClient.get(`${environment.backendUrl}/messages`);
-    this.HttpClient.post(`${environment.backendUrl}/messages`,this.postMessage(Message),{withCredentials}: true);
   }
 
 

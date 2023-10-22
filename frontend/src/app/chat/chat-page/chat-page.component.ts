@@ -4,7 +4,6 @@ import { AuthenticationService } from "src/app/login/authentication.service";
 import { Message } from "../message.model";
 import { MessagesService } from "../messages.service";
 import { FormBuilder } from "@angular/forms";
-//A ajouter
 import { Router } from "@angular/router";
 
 @Component({
@@ -32,7 +31,6 @@ export class ChatPageComponent implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private messagesService: MessagesService,
     private authenticationService: AuthenticationService,
-    //A ajouter
     private router: Router
   ) {
     this.usernameSubscription = this.username$.subscribe((u) => {
@@ -40,7 +38,7 @@ export class ChatPageComponent implements OnInit, OnDestroy {
     if (this.username == '') 
       this.router.navigate(['']);
     });
-    //A ajouter
+    
     this.messagesSubscription = this.messages$.subscribe((m) => {
       this.messages = m;
     
@@ -52,8 +50,7 @@ export class ChatPageComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     if (this.usernameSubscription) {
       this.usernameSubscription.unsubscribe();
-    }
-    //A faire 
+    } 
     if(this.messagesSubscription)
       this.messagesSubscription.unsubscribe();
   }
@@ -67,7 +64,6 @@ export class ChatPageComponent implements OnInit, OnDestroy {
     }
   }
   onLogout() {
-    // À faire
     this.authenticationService.logout();
     this.router.navigate(['']);
   }
