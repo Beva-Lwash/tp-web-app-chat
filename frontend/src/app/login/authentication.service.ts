@@ -37,7 +37,7 @@ export class AuthenticationService {
 
   async logout() {
     await firstValueFrom(
-      this.httpClient.post<LoginResponse>(`${environment.backendUrl}/auth/logout`,null,
+      this.httpClient.post(`${environment.backendUrl}/auth/logout`,null,
     { withCredentials: true }
     ))
     ;
