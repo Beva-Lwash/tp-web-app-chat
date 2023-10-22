@@ -7,7 +7,6 @@ import com.inf5190.chat.websocket.WebSocketManager;
 
 import java.util.List;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -38,6 +37,7 @@ public class MessageController {
     @PostMapping(MESSAGES_PATH)
     public Message creer_message(@RequestBody Message message) {
         Message newMessage = messageRepository.createMessage(message);
+        webSocketManager.notifySessions();
         return newMessage;
     }
 }
