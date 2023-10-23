@@ -21,7 +21,7 @@ public class MessageRepository {
     public List<Message> getMessages(Long fromId) {
         List<Message> nouveauMessages = new ArrayList<Message>();
         for (Message m : messages) {
-            if (fromId <= idGenerator.get()) {
+            if (fromId <= m.id()) {
                 nouveauMessages.add(m);
             }
         }
