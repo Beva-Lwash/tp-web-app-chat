@@ -22,7 +22,6 @@ export class ChatPageComponent implements OnInit, OnDestroy {
   username: string | null = null;
   usernameSubscription: Subscription;
 
-  //A faire
   messages: Message[] | null = [];
   messagesSubscription: Subscription;
   
@@ -57,6 +56,7 @@ export class ChatPageComponent implements OnInit, OnDestroy {
   onPublishMessage(msg: string) {
     if (this.username && msg) {
       this.messagesService.postMessage({
+        id: 0,
         text: msg,
         username: this.username,
         timestamp: Date.now(),

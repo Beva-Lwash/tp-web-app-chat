@@ -19,7 +19,13 @@ public class MessageRepository {
     private final AtomicLong idGenerator = new AtomicLong(0);
 
     public List<Message> getMessages(Long fromId) {
-        return messages;
+        List<Message> nouveauMessages = new ArrayList<Message>();
+        for (Message m : messages) {
+            if (fromId <= idGenerator.get()) {
+                nouveauMessages.add(m);
+            }
+        }
+        return nouveauMessages;
     }
 
     public Message createMessage(Message message) {
