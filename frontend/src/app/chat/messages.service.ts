@@ -27,7 +27,7 @@ export class MessagesService {
     return this.messages.asObservable();
   }
 
-  fetchMessages(): void{
+  fetchMessages(fromId: number | null = null): void{
     const queryParams = fromId !== null ? `?fromId=${fromId}` : '';
     this.HttpClient.get(`${environment.backendUrl}/messages${queryParams}`);
   }
