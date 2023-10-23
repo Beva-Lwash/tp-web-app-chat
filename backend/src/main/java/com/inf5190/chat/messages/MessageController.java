@@ -33,7 +33,7 @@ public class MessageController {
 
     @GetMapping(MESSAGES_PATH)
     public List<Message> getMessages(@RequestParam(name = "fromId", required = false) Long fromId) {
-        List<Message> allMessages = messageRepository.getMessages(null);
+        List<Message> allMessages = messageRepository.getMessages(fromId);
         if (fromId != null) {
             return allMessages.stream()
                     .filter(message -> message.id() > fromId)
