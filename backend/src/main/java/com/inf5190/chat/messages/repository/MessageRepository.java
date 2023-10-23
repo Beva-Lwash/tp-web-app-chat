@@ -29,8 +29,9 @@ public class MessageRepository {
     }
 
     public Message createMessage(Message message) {
-        messages.add(message);
-        return message;
+        Message m = new Message(idGenerator.get(), message.username(), message.timestamp(), message.text());
+        messages.add(m);
+        return m;
     }
 
 }
