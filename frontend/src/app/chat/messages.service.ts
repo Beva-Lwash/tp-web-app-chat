@@ -28,7 +28,8 @@ export class MessagesService {
   }
 
   fetchMessages(): void{
-    this.HttpClient.get(`${environment.backendUrl}/messages`);
+    const queryParams = fromId !== null ? `?fromId=${fromId}` : '';
+    this.HttpClient.get(`${environment.backendUrl}/messages${queryParams}`);
   }
 
 
