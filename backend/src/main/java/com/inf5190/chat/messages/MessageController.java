@@ -30,8 +30,15 @@ public class MessageController {
     }
 
     @GetMapping(MESSAGES_PATH)
-    public List<Message> get_MessageRepository() {
-        return messageRepository.getMessages(null);
+    public List<Message> getMessages(@RequestParam(name = "fromId", 
+    required = false) Long fromId) {
+        List<Message> allMessages = messageRepository.getMessages(null);
+        if (fromId != null) {
+            return allMessages.stream()
+            .filter(message -> message.id() > fromId)
+            .collect(Collectors.toList());
+        }
+        return allMessages; 
     }
 
     @PostMapping(MESSAGES_PATH)
