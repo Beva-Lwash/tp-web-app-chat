@@ -1,6 +1,7 @@
 package com.inf5190.chat.messages.repository;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -19,21 +20,17 @@ public class MessageRepository {
     private final AtomicLong idGenerator = new AtomicLong(0);
 
     public List<Message> getMessages(Long fromId) {
+        List<Message> messages = this.messages.stream().sorted(Comparator.comparingLong((m) -> m.timestamp())).toList();
         if (fromId == null) {
             return messages;
-        } else {
-            List<Message> nouveauMessages = new ArrayList<Message>();
-            for (Message m : messages) {
-                if (fromId <= m.id()) {
-                    nouveauMessages.add(m);
-                }
-            }
-            return nouveauMessages;
         }
+
+        return messages.stream().dropWhile((m) -> m.id() != fromId).skip(1).toList();
     }
 
     public Message createMessage(Message message) {
-        Message m = new Message(idGenerator.get(), message.username(), message.timestamp(), message.text());
+        Message m = new Message(this.idGenerator.incrementAndGet(), message.username(), System.currentTimeMillis(),
+                message.text());
         messages.add(m);
         return m;
     }

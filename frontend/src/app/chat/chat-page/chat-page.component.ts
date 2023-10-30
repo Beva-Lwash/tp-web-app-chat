@@ -1,10 +1,12 @@
 import { Component, OnDestroy, OnInit } from "@angular/core";
-import { Subscription } from "rxjs";
+import { Observable,Subscription } from "rxjs";
 import { AuthenticationService } from "src/app/login/authentication.service";
 import { Message } from "../message.model";
 import { MessagesService } from "../messages.service";
 import { FormBuilder } from "@angular/forms";
 import { Router } from "@angular/router";
+import { WebSocketEvent, WebSocketService } from "../../webSocketService";
+
 
 @Component({
   selector: "app-chat-page",
@@ -24,13 +26,18 @@ export class ChatPageComponent implements OnInit, OnDestroy {
 
   messages: Message[] | null = [];
   messagesSubscription: Subscription;
+
+  notifications$: Observable<WebSocketEvent> | null = null;
+  notificationsSubscription: Subscription | null = null;
+
   
 
   constructor(
     private fb: FormBuilder,
     private messagesService: MessagesService,
     private authenticationService: AuthenticationService,
-    private router: Router
+    private router: Router,
+    private webSocketService: WebSocketService
   ) {
     this.usernameSubscription = this.username$.subscribe((u) => {
       this.username = u;  
@@ -44,7 +51,14 @@ export class ChatPageComponent implements OnInit, OnDestroy {
     });
   }
 
-  ngOnInit(): void {}
+  ngOnInit(){
+    this.notifications$ = this.webSocketService.connect();
+    this.notificationsSubscription = this.notifications$.subscribe(() => {
+      this.messagesService.fetchMessages();
+    });
+    this.messagesService.fetchMessages();
+
+  }
 
   ngOnDestroy(): void {
     if (this.usernameSubscription) {
@@ -52,18 +66,21 @@ export class ChatPageComponent implements OnInit, OnDestroy {
     } 
     if(this.messagesSubscription)
       this.messagesSubscription.unsubscribe();
+    
+      this.webSocketService.disconnect();
   }
-  onPublishMessage(msg: string) {
+  
+  async onPublishMessage(msg: string) {
     if (this.username && msg) {
-      this.messagesService.postMessage({
-        id:0,
+      await this.messagesService.postMessage({
         text: msg,
         username: this.username,
-        timestamp: Date.now(),
       });
     }
   }
   onLogout() {
+    this.messagesService.clear();
+    this.webSocketService.disconnect();
     this.authenticationService.logout();
     this.router.navigate(['']);
   }

@@ -4,3 +4,8 @@ export interface Message {
   username: string;
   timestamp: number;
 }
+
+export interface NewMessageResquest{
+  text: string;
+  username: string;
+}
