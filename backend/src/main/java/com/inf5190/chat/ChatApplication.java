@@ -1,10 +1,19 @@
 package com.inf5190.chat;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 
+import com.google.auth.oauth2.GoogleCredentials;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.FirebaseOptions;
 import com.inf5190.chat.auth.AuthController;
 import com.inf5190.chat.auth.filter.AuthFilter;
 
@@ -12,14 +21,33 @@ import com.inf5190.chat.auth.session.SessionDataAccessor;
 import com.inf5190.chat.auth.session.SessionManager;
 import com.inf5190.chat.messages.MessageController;
 
+import io.jsonwebtoken.io.IOException;
+
 /**
  * Application spring boot.
  */
 @SpringBootApplication
 public class ChatApplication {
 
-    public static void main(String[] args) {
-        SpringApplication.run(ChatApplication.class, args);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ChatApplication.class);
+
+    public static void main(String[] args) throws java.io.IOException {
+        try {
+            if (FirebaseApp.getApps().size() == 0) {
+                FileInputStream serviceAccount = new FileInputStream("firebase-key.json");
+                FirebaseOptions options = FirebaseOptions.builder()
+                        .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+                        .build();
+                LOGGER.info("Initializing Firebase application.");
+                FirebaseApp.initializeApp(options);
+            }
+            LOGGER.info("Firebase application already initialized.");
+            SpringApplication.run(ChatApplication.class, args);
+        } catch (IOException e) {
+            System.err.println("Could not initialise application. Please check your service account key path");
+        } catch (FileNotFoundException e) {
+            System.err.println("Could not initialise application. Please check your service account key path");
+        }
     }
 
     /**
