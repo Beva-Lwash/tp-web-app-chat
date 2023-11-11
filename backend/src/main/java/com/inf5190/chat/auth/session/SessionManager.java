@@ -2,14 +2,12 @@ package com.inf5190.chat.auth.session;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 import javax.crypto.SecretKey;
 
 import org.springframework.stereotype.Repository;
 
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
@@ -18,8 +16,6 @@ import io.jsonwebtoken.io.Encoders;
 import io.jsonwebtoken.security.Keys;
 
 import java.time.Instant;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 
 /**
@@ -33,8 +29,7 @@ public class SessionManager {
     private final Map<String, SessionData> sessions = new HashMap<String, SessionData>();
 
     private static SecretKey key = Jwts.SIG.HS256.key().build();
-    private static String secretString = Encoders.BASE64.encode(key.getEncoded());
-    private static final String SECRET_KEY_BASE64 = secretString;
+    private static final String SECRET_KEY_BASE64 = Encoders.BASE64.encode(key.getEncoded());
     private final SecretKey secretKey;
     private final JwtParser jwtParser;
 
@@ -46,19 +41,16 @@ public class SessionManager {
     public String addSession(SessionData authData) {
         Date expirationDate = new Date(System.currentTimeMillis() + 2 * 60 * 60 * 1000);
         String jws = Jwts.builder().issuedAt(Date.from(Instant.now())).expiration(expirationDate)
-                .claim("aud", "Chat-age-app").subject(authData.username()).signWith(this.secretKey).compact();
+                .claim("aud", "Chat-page-app").subject(authData.username()).signWith(this.secretKey).compact();
 
         return jws;
     }
 
-    /* A reverifier cette methode..! */
     public SessionData getSession(String sessionId) {
         try {
-            Claims claims = Jwts.parser()
-                    .verifyWith(secretKey)
-                    .build()
+            Claims claims = this.jwtParser
                     .parseSignedClaims(sessionId)
-                    .getBody();
+                    .getPayload();
 
             String username = claims.getSubject();
             return new SessionData(username);
