@@ -1,13 +1,23 @@
 package com.inf5190.chat.messages.repository;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
 
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.ArrayList;
+import java.util.Collections;
+
+
+import com.google.cloud.firestore.CollectionReference;
+import com.google.cloud.firestore.DocumentReference;
+import com.google.cloud.firestore.DocumentSnapshot;
+import com.google.cloud.firestore.Firestore;
+import com.google.cloud.firestore.Query;
+import com.google.cloud.firestore.QueryDocumentSnapshot;
+import com.google.cloud.firestore.QuerySnapshot;
 import com.inf5190.chat.messages.model.Message;
 
 import org.springframework.stereotype.Repository;
+import com.google.firebase.cloud.FirestoreClient;
 
 /**
  * Classe qui gère la persistence des messages.
@@ -16,23 +26,57 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public class MessageRepository {
-    private final List<Message> messages = new ArrayList<Message>();
-    private final AtomicLong idGenerator = new AtomicLong(0);
+    private final CollectionReference messagesCollection;
 
-    public List<Message> getMessages(Long fromId) {
-        List<Message> messages = this.messages.stream().sorted(Comparator.comparingLong((m) -> m.timestamp())).toList();
-        if (fromId == null) {
+    public MessageRepository() {
+        Firestore firestore = FirestoreClient.getFirestore();
+        this.messagesCollection = firestore.collection("messages");
+    }
+
+
+    public List<Message> getMessages(String fromId) {
+        try {
+            Query query;
+
+            if (fromId == null || fromId.isEmpty()) {
+                query = messagesCollection.orderBy("timestamp").limit(20);
+            } else {
+                DocumentSnapshot startAfterDoc = messagesCollection.document(fromId).get().get();
+                query = messagesCollection.orderBy("timestamp").startAfter(startAfterDoc).limit(20);
+            }
+
+            QuerySnapshot querySnapshot = query.get().get();
+
+            List<Message> messages = new ArrayList<>();
+            for (QueryDocumentSnapshot document : querySnapshot.getDocuments()) {
+                messages.add(document.toObject(Message.class));
+            }
+
             return messages;
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace(); 
+            return Collections.emptyList(); // Retourner une liste vide en cas d'erreur
         }
-
-        return messages.stream().dropWhile((m) -> m.id() != fromId).skip(1).toList();
     }
 
     public Message createMessage(Message message) {
-        Message m = new Message(this.idGenerator.incrementAndGet(), message.username(), System.currentTimeMillis(),
-                message.text());
-        messages.add(m);
-        return m;
+    try {
+        DocumentReference documentReference = messagesCollection.add(message).get();
+
+        String messageId = documentReference.getId();
+        Message createdMessage = new Message(
+            messageId,
+            message.username(),
+            System.currentTimeMillis(),
+            message.text());
+
+        documentReference.set(createdMessage);
+
+        return createdMessage;
+    } catch (InterruptedException | ExecutionException e) {
+        e.printStackTrace(); 
+        return null; 
     }
+}
 
 }
