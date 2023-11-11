@@ -32,11 +32,11 @@ public class MessageController {
     }
 
     @GetMapping(MESSAGES_PATH)
-    public List<Message> getMessages(@RequestParam(name = "fromId", required = false) Long fromId) {
+    public List<Message> getMessages(@RequestParam(name = "fromId", required = false) String fromId) {
         List<Message> allMessages = messageRepository.getMessages(fromId);
         if (fromId != null) {
             return allMessages.stream()
-                    .filter(message -> message.id() > fromId)
+                    .filter(message -> message.id().compareTo(fromId) > 0)
                     .collect(Collectors.toList());
         }
         return allMessages;
