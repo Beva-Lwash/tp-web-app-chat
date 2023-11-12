@@ -75,6 +75,7 @@ export class ChatPageComponent implements OnInit, OnDestroy {
       await this.messagesService.postMessage({
         text: msg,
         username: this.username,
+        imageData: null,
       });
     }
   }
