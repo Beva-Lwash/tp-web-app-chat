@@ -6,7 +6,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.ArrayList;
 import java.util.Collections;
 
-
+import com.google.cloud.Timestamp;
 import com.google.cloud.firestore.CollectionReference;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
@@ -26,12 +26,9 @@ import com.google.firebase.cloud.FirestoreClient;
  */
 @Repository
 public class MessageRepository {
-    private final CollectionReference messagesCollection;
-
-    public MessageRepository() {
-        Firestore firestore = FirestoreClient.getFirestore();
-        this.messagesCollection = firestore.collection("messages");
-    }
+    private static final String COLLECTION_NAME = "messages";
+    Firestore firestore = FirestoreClient.getFirestore();
+    private final CollectionReference messagesCollection = firestore.collection(COLLECTION_NAME);
 
 
     public List<Message> getMessages(String fromId) {
@@ -59,24 +56,28 @@ public class MessageRepository {
         }
     }
 
-    public Message createMessage(Message message) {
-    try {
-        DocumentReference documentReference = messagesCollection.add(message).get();
+    public Message createMessage(Message message) throws InterruptedException, 
+            ExecutionException {
+        DocumentReference documentReference = 
+            this.firestore.collection(COLLECTION_NAME).document();
 
-        String messageId = documentReference.getId();
+        FirestoreMessage firestoreMessage = new FirestoreMessage(
+                message.username(),
+                Timestamp.now(),
+                message.text());
+
+        documentReference.create(firestoreMessage).get();
+
         Message createdMessage = new Message(
-            messageId,
-            message.username(),
-            System.currentTimeMillis(),
-            message.text());
-
-        documentReference.set(createdMessage);
+            message.id(), 
+            firestoreMessage.getUsername(), 
+            firestoreMessage.getTimestamp().toDate().getTime(), 
+            firestoreMessage.getText());
 
         return createdMessage;
-    } catch (InterruptedException | ExecutionException e) {
-        e.printStackTrace(); 
-        return null; 
+    
     }
-}
 
 }
+
+
