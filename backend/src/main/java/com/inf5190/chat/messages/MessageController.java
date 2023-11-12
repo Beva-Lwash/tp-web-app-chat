@@ -6,6 +6,7 @@ import com.inf5190.chat.messages.repository.MessageRepository;
 import com.inf5190.chat.websocket.WebSocketManager;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 import org.springframework.web.bind.annotation.GetMapping;
@@ -43,7 +44,7 @@ public class MessageController {
     }
 
     @PostMapping(MESSAGES_PATH)
-    public Message creer_message(@RequestBody Message message) {
+    public Message creer_message(@RequestBody Message message) throws InterruptedException, ExecutionException {
         Message newMessage = messageRepository.createMessage(message);
         webSocketManager.notifySessions();
         return newMessage;
