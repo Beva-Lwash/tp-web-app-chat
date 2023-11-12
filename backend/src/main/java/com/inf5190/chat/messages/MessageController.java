@@ -2,6 +2,7 @@ package com.inf5190.chat.messages;
 
 import com.inf5190.chat.auth.session.SessionDataAccessor;
 import com.inf5190.chat.messages.model.Message;
+import com.inf5190.chat.messages.model.NewMessageRequest;
 import com.inf5190.chat.messages.repository.MessageRepository;
 import com.inf5190.chat.websocket.WebSocketManager;
 
@@ -44,7 +45,8 @@ public class MessageController {
     }
 
     @PostMapping(MESSAGES_PATH)
-    public Message creer_message(@RequestBody Message message) throws InterruptedException, ExecutionException {
+    public Message creer_message(@RequestBody NewMessageRequest message)
+            throws InterruptedException, ExecutionException {
         Message newMessage = messageRepository.createMessage(message);
         webSocketManager.notifySessions();
         return newMessage;

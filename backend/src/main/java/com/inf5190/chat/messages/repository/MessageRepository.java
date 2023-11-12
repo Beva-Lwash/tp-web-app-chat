@@ -14,6 +14,7 @@ import com.google.cloud.firestore.Query;
 import com.google.cloud.firestore.QueryDocumentSnapshot;
 import com.google.cloud.firestore.QuerySnapshot;
 import com.inf5190.chat.messages.model.Message;
+import com.inf5190.chat.messages.model.NewMessageRequest;
 
 import org.springframework.stereotype.Repository;
 import com.google.firebase.cloud.FirestoreClient;
@@ -53,22 +54,20 @@ public class MessageRepository {
         }
     }
 
-    public Message createMessage(Message message) throws InterruptedException,
+    public NewMessageRequest createMessage(NewMessageRequest message) throws InterruptedException,
             ExecutionException {
         DocumentReference documentReference = this.firestore.collection(COLLECTION_NAME).document();
 
         FirestoreMessage firestoreMessage = new FirestoreMessage(
                 message.username(),
                 Timestamp.now(),
-                message.text());
+                message.text(), null);
 
         documentReference.create(firestoreMessage).get();
 
-        Message createdMessage = new Message(
-                message.id(),
+        NewMessageRequest createdMessage = new NewMessageRequest(
                 firestoreMessage.getUsername(),
-                firestoreMessage.getTimestamp().toDate().getTime(),
-                firestoreMessage.getText());
+                firestoreMessage.getText(), null);
 
         return createdMessage;
 
