@@ -2,10 +2,8 @@ package com.inf5190.chat.messages.repository;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 
 import com.google.api.core.ApiFuture;
 import com.google.cloud.Timestamp;
