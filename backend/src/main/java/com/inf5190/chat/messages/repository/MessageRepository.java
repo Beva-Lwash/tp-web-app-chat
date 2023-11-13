@@ -19,6 +19,7 @@ import com.google.cloud.firestore.QuerySnapshot;
 import com.google.cloud.firestore.Query.Direction;
 import com.inf5190.chat.messages.model.Message;
 import com.inf5190.chat.messages.model.NewMessageRequest;
+import com.inf5190.chat.messages.model.ChatImageData;
 
 import org.springframework.stereotype.Repository;
 import com.google.firebase.cloud.FirestoreClient;
@@ -45,8 +46,9 @@ public class MessageRepository {
                 ApiFuture<QuerySnapshot> querysnapshot = query.get();
                 List<QueryDocumentSnapshot> documents = querysnapshot.get().getDocuments();
                 for (DocumentSnapshot document : documents) {
+                    long time = Long.parseLong(document.toObject(FirestoreMessage.class).getTimestamp().toString());
                     messages.add(new Message(document.getId(), document.toObject(FirestoreMessage.class).getUsername(),
-                            Long.parseLong(document.toObject(FirestoreMessage.class).getTimestamp().toString()),
+                            time,
                             document.toObject(FirestoreMessage.class).getText(), null));
                 }
             } else {
@@ -60,8 +62,9 @@ public class MessageRepository {
                 future = actualquery.get();
                 docs = future.get().getDocuments();
                 for (DocumentSnapshot document : docs) {
+                    long time = Long.parseLong(document.toObject(FirestoreMessage.class).getTimestamp().toString());
                     messages.add(new Message(document.getId(), document.toObject(FirestoreMessage.class).getUsername(),
-                            Long.parseLong(document.toObject(FirestoreMessage.class).getTimestamp().toString()),
+                            time,
                             document.toObject(FirestoreMessage.class).getText(), null));
                 }
             }
@@ -76,11 +79,16 @@ public class MessageRepository {
     public NewMessageRequest createMessage(NewMessageRequest message) throws InterruptedException,
             ExecutionException {
         DocumentReference documentReference = this.firestore.collection(COLLECTION_NAME).document();
-
+        ChatImageData img;
+        if (message.imageData() != null) {
+            img = new ChatImageData(message.imageData().data(), message.imageData().type());
+        } else {
+            img = new ChatImageData(null, null);
+        }
         FirestoreMessage firestoreMessage = new FirestoreMessage(
                 message.username(),
                 Timestamp.now(),
-                message.text(), null);
+                message.text(), img.data());
 
         documentReference.create(firestoreMessage).get();
 

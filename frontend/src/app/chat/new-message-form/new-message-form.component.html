@@ -1,9 +1,13 @@
 <form (ngSubmit)="onPublishMessage()" [formGroup]="messageForm">
     <mat-form-field class="mff">
-      <mat-label>Entrez votre message</mat-label>
-      <input matInput name="message" type="text" formControlName="msg" />
-      <button mat-icon-button matSuffix color="primary"  type="submit">
-          <mat-icon> send </mat-icon>
-       </button>
-   </mat-form-field>
-  </form>
+        <mat-label>Entrez votre message</mat-label>
+        <input matInput name="message" type="text" formControlName="msg" />
+        <input #file name="file" type="file" style="display: none" accept="image/*" (change)="fileChanged($event)" />
+        <button mat-icon-button matSuffix (click)="file.click()">
+            <mat-icon> image </mat-icon>
+        </button>
+        <button mat-icon-button matSuffix color="primary" type="submit">
+            <mat-icon> send </mat-icon>
+        </button>
+    </mat-form-field>
+</form>
