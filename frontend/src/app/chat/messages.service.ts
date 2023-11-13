@@ -3,7 +3,6 @@ import { BehaviorSubject, Observable, connect, firstValueFrom } from "rxjs";
 import { Message, NewMessageResquest} from "./message.model";
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { environment } from "src/environments/environment";
-import { WebSocketService } from "../webSocketService";
 
 @Injectable({
   providedIn: "root",

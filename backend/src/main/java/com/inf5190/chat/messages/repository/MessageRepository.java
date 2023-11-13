@@ -2,9 +2,12 @@ package com.inf5190.chat.messages.repository;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 
+import com.google.api.core.ApiFuture;
 import com.google.cloud.Timestamp;
 import com.google.cloud.firestore.CollectionReference;
 import com.google.cloud.firestore.DocumentReference;
@@ -13,6 +16,7 @@ import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.Query;
 import com.google.cloud.firestore.QueryDocumentSnapshot;
 import com.google.cloud.firestore.QuerySnapshot;
+import com.google.cloud.firestore.Query.Direction;
 import com.inf5190.chat.messages.model.Message;
 import com.inf5190.chat.messages.model.NewMessageRequest;
 
@@ -32,19 +36,34 @@ public class MessageRepository {
 
     public List<Message> getMessages(String fromId) {
         try {
-            Query query;
-
-            if (fromId == null || fromId.isEmpty()) {
-                query = messagesCollection.orderBy("timestamp").limit(20);
-            } else {
-                DocumentSnapshot startAfterDoc = messagesCollection.document(fromId).get().get();
-                query = messagesCollection.orderBy("timestamp").startAfter(startAfterDoc).limit(20);
-            }
-
-            QuerySnapshot querySnapshot = query.get().get();
             List<Message> messages = new ArrayList<>();
-            for (QueryDocumentSnapshot document : querySnapshot.getDocuments()) {
-                messages.add(document.toObject(Message.class));
+            // messages = this.messages.stream().sorted(Comparator.comparingLong((m) ->
+            // m.timestamp())).toList();
+            if (fromId == null || fromId.isEmpty()) {
+                Query query = messagesCollection.orderBy("timestamp", Direction.ASCENDING).limit(20);
+
+                ApiFuture<QuerySnapshot> querysnapshot = query.get();
+                List<QueryDocumentSnapshot> documents = querysnapshot.get().getDocuments();
+                for (DocumentSnapshot document : documents) {
+                    messages.add(new Message(document.getId(), document.toObject(FirestoreMessage.class).getUsername(),
+                            Long.parseLong(document.toObject(FirestoreMessage.class).getTimestamp().toString()),
+                            document.toObject(FirestoreMessage.class).getText(), null));
+                }
+            } else {
+                Query query = messagesCollection.orderBy(fromId);
+                ApiFuture<QuerySnapshot> future = query.get();
+                List<QueryDocumentSnapshot> docs = future.get().getDocuments();
+
+                QueryDocumentSnapshot docsava = docs.get(docs.size() - 1);
+                Query actualquery = messagesCollection.orderBy("timestamp").startAfter(docsava);
+
+                future = actualquery.get();
+                docs = future.get().getDocuments();
+                for (DocumentSnapshot document : docs) {
+                    messages.add(new Message(document.getId(), document.toObject(FirestoreMessage.class).getUsername(),
+                            Long.parseLong(document.toObject(FirestoreMessage.class).getTimestamp().toString()),
+                            document.toObject(FirestoreMessage.class).getText(), null));
+                }
             }
 
             return messages;

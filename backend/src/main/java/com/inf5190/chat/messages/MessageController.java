@@ -45,9 +45,9 @@ public class MessageController {
     }
 
     @PostMapping(MESSAGES_PATH)
-    public Message creer_message(@RequestBody NewMessageRequest message)
+    public NewMessageRequest creer_message(@RequestBody NewMessageRequest message)
             throws InterruptedException, ExecutionException {
-        Message newMessage = messageRepository.createMessage(message);
+        NewMessageRequest newMessage = messageRepository.createMessage(message);
         webSocketManager.notifySessions();
         return newMessage;
     }
