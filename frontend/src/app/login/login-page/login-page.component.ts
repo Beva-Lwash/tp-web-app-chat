@@ -15,19 +15,29 @@ export class LoginPageComponent implements OnInit {
     private router: Router
   ) {}
 
-  ngOnInit(): void {}
+  errorPresent = false;
+  errorMessage = "";
+
+  ngOnInit(): void {
+    this.errorPresent = false;
+  }
 
   async onLogin(userCredentials: UserCredentials) {
     try {
       await this.authenticationService.login(userCredentials);
+      this.router.navigate(["/chat"]);
     } catch (e) {
+      this.errorPresent = true;
       if (e instanceof HttpErrorResponse && e.status == 403) {
-        e.error("Mot de passe Invalide");
-        console.error("mdp invalide", e.message);
+        this.errorMessage = "Mot de pass invalide!";
+        console.log(this.errorMessage);
       } else {
         e = new Error("Problème de connexion");
+        if (e instanceof Error) {
+          this.errorMessage = e.message;
+          console.log(this.errorMessage);
+        }
       }
     }
-    this.router.navigate(["/chat"]);
   }
 }
