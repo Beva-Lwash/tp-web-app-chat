@@ -2,6 +2,7 @@ import { Component, OnInit } from "@angular/core";
 import { UserCredentials } from "../model/user-credentials";
 import { AuthenticationService } from "../authentication.service";
 import { Router } from "@angular/router";
+import { HttpErrorResponse } from "@angular/common/http";
 
 @Component({
   selector: "app-login-page",
@@ -17,7 +18,16 @@ export class LoginPageComponent implements OnInit {
   ngOnInit(): void {}
 
   async onLogin(userCredentials: UserCredentials) {
-    await this.authenticationService.login(userCredentials);
+    try {
+      await this.authenticationService.login(userCredentials);
+    } catch (e) {
+      if (e instanceof HttpErrorResponse && e.status == 403) {
+        e.error("Mot de passe Invalide");
+        console.error("mdp invalide", e.message);
+      } else {
+        e = new Error("Problème de connexion");
+      }
+    }
     this.router.navigate(["/chat"]);
   }
 }
