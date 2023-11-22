@@ -1,5 +1,5 @@
 import { Component, EventEmitter, OnInit, Output } from "@angular/core";
-import { FormBuilder } from "@angular/forms";
+import { FormBuilder, FormGroupDirective, Validators } from "@angular/forms";
 import { UserCredentials } from "../model/user-credentials";
 
 @Component({
@@ -9,8 +9,8 @@ import { UserCredentials } from "../model/user-credentials";
 })
 export class LoginFormComponent implements OnInit {
   loginForm = this.fb.group({
-    username: "",
-    password: "",
+    username: [null, [Validators.required]],
+    password: [null, [Validators.required]],
   });
 
   @Output()
@@ -19,6 +19,14 @@ export class LoginFormComponent implements OnInit {
   constructor(private fb: FormBuilder) {}
 
   ngOnInit(): void {}
+
+  showUsernameRequiredError(): boolean {
+    return this.showError("username", "required");
+  }
+
+  showPasswordRequiredError(): boolean {
+    return this.showError("password", "required");
+  }
 
   onLogin() {
     if (
@@ -30,6 +38,16 @@ export class LoginFormComponent implements OnInit {
         username: this.loginForm.value.username,
         password: this.loginForm.value.password,
       });
+    } else {
+      this.loginForm.markAllAsTouched();
     }
+  }
+
+  private showError(field: "password" | "username", error: string): boolean {
+    return (
+      this.loginForm.controls[field].hasError(error) &&
+      (this.loginForm.controls[field].dirty ||
+        this.loginForm.controls[field].touched)
+    );
   }
 }

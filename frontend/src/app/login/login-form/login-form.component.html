@@ -1,5 +1,9 @@
 <div>
-  <form class="form" (ngSubmit)="onLogin()" [formGroup]="loginForm">
+  <form 
+  #formDirective="ngForm"
+  class="form" 
+  (ngSubmit)="onLogin()" 
+  [formGroup]="loginForm">
     <div>
       <div>
         <mat-form-field>
@@ -10,6 +14,7 @@
             type="text"
             formControlName="username"
           />
+          <mat-error *ngIf="showUsernameRequiredError()">Entrer votre nom d'usager svp</mat-error>
         </mat-form-field>
       </div>
       <div>
@@ -21,6 +26,7 @@
             type="password"
             formControlName="password"
           />
+          <mat-error *ngIf="showPasswordRequiredError()">Entrer votre mot de passe svp</mat-error>
         </mat-form-field>
       </div>
     </div>
