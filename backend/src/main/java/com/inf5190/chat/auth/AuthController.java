@@ -1,12 +1,15 @@
 package com.inf5190.chat.auth;
 
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 import javax.servlet.http.Cookie;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,55 +22,61 @@ import com.inf5190.chat.auth.repository.FirestoreUserAccount;
 import com.inf5190.chat.auth.repository.UserAccountRepository;
 import com.inf5190.chat.auth.session.SessionData;
 import com.inf5190.chat.auth.session.SessionManager;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
-@RestController
+/**
+ * Contrôleur qui gère l'API de login et logout.
+ */
+@RestController()
 public class AuthController {
     public static final String AUTH_LOGIN_PATH = "/auth/login";
     public static final String AUTH_LOGOUT_PATH = "/auth/logout";
     public static final String SESSION_ID_COOKIE_NAME = "sid";
 
-    private final UserAccountRepository userAccountRepository;
     private final SessionManager sessionManager;
+    private final UserAccountRepository userAccountRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public AuthController(UserAccountRepository userAccountRepository, SessionManager sessionManager,
+    public AuthController(SessionManager sessionManager, UserAccountRepository userAccountRepository,
             PasswordEncoder passwordEncoder) {
-        this.userAccountRepository = userAccountRepository;
         this.sessionManager = sessionManager;
+        this.userAccountRepository = userAccountRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
     @PostMapping(AUTH_LOGIN_PATH)
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest)
             throws InterruptedException, ExecutionException {
-        FirestoreUserAccount existingUserAccount = userAccountRepository.getUserAccount(loginRequest.username());
+        FirestoreUserAccount account = this.userAccountRepository.getUserAccount(loginRequest.username());
+        if (account == null) {
+            String encodedPassword = this.passwordEncoder.encode(loginRequest.password());
+            this.userAccountRepository
+                    .createUserAccount(new FirestoreUserAccount(loginRequest.username(), encodedPassword));
+        } else if (!this.passwordEncoder.matches(loginRequest.password(), account.getEncodedPassword())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+        }
 
-        if (existingUserAccount == null) {
-            String hashedPassword = passwordEncoder.encode(loginRequest.password());
-            FirestoreUserAccount newUserAccount = new FirestoreUserAccount(loginRequest.username(), hashedPassword);
-            userAccountRepository.setUserAccount(newUserAccount);
-        } else if (!passwordEncoder.matches(loginRequest.password(), existingUserAccount.getEncodedPassword()))
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Mot de passe incorrect!");
+        String sessionId = this.sessionManager.addSession(new SessionData(loginRequest.username()));
 
-        SessionData sessionData = new SessionData(loginRequest.username());
-        String sessionId = this.sessionManager.addSession(sessionData);
+        ResponseCookie sessionCookie = this.createResponseSessionCookie(sessionId, TimeUnit.DAYS.toSeconds(1));
 
-        LoginResponse loginResponse = new LoginResponse(loginRequest.username());
-        ResponseCookie cookie = ResponseCookie.from(SESSION_ID_COOKIE_NAME, sessionId)
-                .httpOnly(true)
-                .secure(true)
-                .path("/")
-                .maxAge(86400)
-                .build();
-
-        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString()).body(loginResponse);
+        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, sessionCookie.toString())
+                .body(new LoginResponse(loginRequest.username()));
     }
 
     @PostMapping(AUTH_LOGOUT_PATH)
-    public ResponseEntity<Void> logout(@CookieValue("sid") Cookie sessionCookie) {
-        this.sessionManager.removeSession(sessionCookie.getValue());
-        ResponseCookie cookie_vide = ResponseCookie.from(SESSION_ID_COOKIE_NAME, "").maxAge(0).build();
-        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie_vide.toString()).build();
+    public ResponseEntity<Void> logout() {
+        ResponseCookie deleteSessionCookie = this.createResponseSessionCookie(null, 0);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, deleteSessionCookie.toString()).body(null);
+
+    }
+
+    private ResponseCookie createResponseSessionCookie(String sessiondId, long maxAge) {
+        return ResponseCookie.from(SESSION_ID_COOKIE_NAME, sessiondId)
+                .path("/")
+                .httpOnly(true)
+                .secure(true)
+                .maxAge(maxAge)
+                .build();
     }
 }

@@ -2,17 +2,4 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 1%;
-  border: 1px solid #ccc;
-  border-radius: 18px;
-  padding: 30px;
-  background-color:#fffffffd;
-}
-.utilisateur {
-  padding: 5px;
-
-}
-.motDePasse {
-  padding: 5px;
-
 }

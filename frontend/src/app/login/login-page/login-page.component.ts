@@ -1,6 +1,7 @@
 import { Component, OnInit } from "@angular/core";
 import { UserCredentials } from "../model/user-credentials";
 import { AuthenticationService } from "../authentication.service";
+import { Router } from "@angular/router";
 
 @Component({
   selector: "app-login-page",
@@ -8,13 +9,15 @@ import { AuthenticationService } from "../authentication.service";
   styleUrls: ["./login-page.component.css"],
 })
 export class LoginPageComponent implements OnInit {
-  constructor(private authenticate: AuthenticationService) {
-    this.authenticate;
-  } 
+  constructor(
+    private authenticationService: AuthenticationService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {}
 
-  onLogin(UserCredentials: UserCredentials) {
-    this.authenticate.login(UserCredentials);
-    }
+  async onLogin(userCredentials: UserCredentials) {
+    await this.authenticationService.login(userCredentials);
+    this.router.navigate(["/chat"]);
+  }
 }

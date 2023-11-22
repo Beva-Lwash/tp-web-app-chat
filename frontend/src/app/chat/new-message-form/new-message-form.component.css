@@ -1,9 +1,7 @@
 form {
-    display: flex;
-} 
-input[type="text"] {
-    flex: 1;
+  display: flex;
 }
-.mff{
-  width: 100%;
+
+mat-form-field {
+  flex: 1;
 }

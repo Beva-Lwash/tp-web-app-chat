@@ -7,8 +7,6 @@ import { UserCredentials } from "../model/user-credentials";
   templateUrl: "./login-form.component.html",
   styleUrls: ["./login-form.component.css"],
 })
-
-
 export class LoginFormComponent implements OnInit {
   loginForm = this.fb.group({
     username: "",
@@ -22,11 +20,16 @@ export class LoginFormComponent implements OnInit {
 
   ngOnInit(): void {}
 
-
   onLogin() {
-    if(this.loginForm.valid)
-      this.login.emit(<UserCredentials>this.loginForm.value);    
+    if (
+      this.loginForm.valid &&
+      this.loginForm.value.username &&
+      this.loginForm.value.password
+    ) {
+      this.login.emit({
+        username: this.loginForm.value.username,
+        password: this.loginForm.value.password,
+      });
+    }
   }
-
 }
-

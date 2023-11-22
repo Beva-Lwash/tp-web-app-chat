@@ -1,18 +1,18 @@
 export interface Message {
-  id: string; 
+  id: string;
   text: string;
   username: string;
   timestamp: number;
-  imageUrl:string|null;
+  imageUrl: string | null;
 }
 
-export interface NewMessageResquest{
+export interface NewMessageRequest {
   text: string;
   username: string;
-  imageData: ChatImageData|null;
+  imageData: ChatImageData | null;
 }
 
-export interface ChatImageData{
+export interface ChatImageData {
   data: string;
   type: string;
 }

@@ -1,9 +1,15 @@
 <div class="chat">
   <div class="chat-logout-button">
-    <button  mat-raised-button color="warn" (click)="onLogout()">Déconnexion</button>
+    <button mat-raised-button color="primary" (click)="onLogout()">
+      Déconnexion
+    </button>
   </div>
   <div class="chat-messages">
-    <app-message-list [messages]="messages"></app-message-list>
-    <app-new-message-form (messagePublished)="onPublishMessage($event)"></app-new-message-form>
+    <div>
+      <app-messages [messages]="(messages$ | async)!"></app-messages>
+      <app-new-message-form
+        (newMessage)="onPublishMessage($event)"
+      ></app-new-message-form>
+    </div>
   </div>
 </div>

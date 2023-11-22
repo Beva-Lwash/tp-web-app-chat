@@ -1,9 +1,5 @@
 package com.inf5190.chat.auth.repository;
 
-import com.google.cloud.firestore.Firestore;
-
-import com.google.firebase.cloud.FirestoreClient;
-
 public class FirestoreUserAccount {
     private String username;
     private String encodedPassword;

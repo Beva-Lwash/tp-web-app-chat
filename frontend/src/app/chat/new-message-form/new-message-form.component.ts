@@ -1,7 +1,5 @@
 import { Component, EventEmitter, Output } from "@angular/core";
-import { FormBuilder, FormGroup, Validators } from "@angular/forms";
-import { FileReaderService } from "../filereader.service";
-import { ChatImageData } from "../message.model";
+import { FormBuilder } from "@angular/forms";
 
 @Component({
   selector: "app-new-message-form",
@@ -9,27 +7,34 @@ import { ChatImageData } from "../message.model";
   styleUrls: ["./new-message-form.component.css"],
 })
 export class NewMessageFormComponent {
-  @Output() messagePublished = new EventEmitter<any>();
-  file: File | null = null;
-  fs = new FileReaderService();
-
   messageForm = this.fb.group({
     msg: "",
+    filename: "",
   });
+
+  private file: File | null = null;
+
+  @Output()
+  newMessage = new EventEmitter<{ message: string; file: File | null }>();
 
   constructor(private fb: FormBuilder) {}
 
-  onPublishMessage() {
-    if (this.messageForm.valid) {
-      const message = this.messageForm.value.msg;
+  get hasImage() {
+    return this.file != null;
+  }
 
-      this.messagePublished.emit(message);
+  onSendMessage() {
+    if (this.messageForm.valid && this.messageForm.value.msg) {
+      this.newMessage.emit({
+        message: this.messageForm.value.msg,
+        file: this.file,
+      });
       this.messageForm.reset();
+      this.file = null;
     }
   }
 
   fileChanged(event: any) {
     this.file = event.target.files[0];
-    const c = this.fs.readFile(this.file!!);
   }
 }

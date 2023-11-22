@@ -1,20 +1,31 @@
 <div>
   <form class="form" (ngSubmit)="onLogin()" [formGroup]="loginForm">
     <div>
-      <div class="utilisateur">
-        <mat-form-field hintLabel="Min 1 caractere">
-          <mat-label>Nom d'utilisateur</mat-label>
-          <input name="username" type="text" formControlName="username" matInput #input placeholder="Ex.: INF5190">
+      <div>
+        <mat-form-field>
+          <mat-label>Nom d'usager</mat-label>
+          <input
+            matInput
+            name="username"
+            type="text"
+            formControlName="username"
+          />
         </mat-form-field>
       </div>
-      <div class="motDePasse">
+      <div>
         <mat-form-field>
           <mat-label>Mot de passe</mat-label>
-          <input name="password" type="password" formControlName="password" matInput >
+          <input
+            matInput
+            name="password"
+            type="password"
+            formControlName="password"
+          />
         </mat-form-field>
       </div>
     </div>
     <div>
-      <button type="submit" mat-raised-button color="primary">Connexion</button></div>
+      <button mat-raised-button color="primary" type="submit">Connexion</button>
+    </div>
   </form>
 </div>

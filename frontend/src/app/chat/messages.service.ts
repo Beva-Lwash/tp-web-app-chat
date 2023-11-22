@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
-import { BehaviorSubject, Observable, connect, firstValueFrom } from "rxjs";
-import { Message, NewMessageResquest} from "./message.model";
+import { BehaviorSubject, Observable, firstValueFrom } from "rxjs";
+import { Message, NewMessageRequest } from "./message.model";
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { environment } from "src/environments/environment";
 
@@ -8,14 +8,13 @@ import { environment } from "src/environments/environment";
   providedIn: "root",
 })
 export class MessagesService {
-  messages = new BehaviorSubject<Message[]>([]);
+  private messages = new BehaviorSubject<Message[]>([]);
 
+  constructor(private httpClient: HttpClient) {}
 
-  constructor(private HttpClient: HttpClient) {}
-
-  async postMessage(message: NewMessageResquest): Promise<Message> {
+  async postMessage(message: NewMessageRequest): Promise<Message> {
     return firstValueFrom(
-      this.HttpClient.post<Message>(
+      this.httpClient.post<Message>(
         `${environment.backendUrl}/messages`,
         message,
         {
@@ -25,32 +24,33 @@ export class MessagesService {
     );
   }
 
-  getMessages(): Observable<Message[]> {
-    return this.messages.asObservable();
-  }
-
-   async fetchMessages(){
+  async fetchMessages() {
     const lastMessageId =
       this.messages.value.length > 0
         ? this.messages.value[this.messages.value.length - 1].id
         : null;
-    let queryParameters =
-      lastMessageId != null
-        ? new HttpParams().set("fromId", lastMessageId)
-        : new HttpParams();
+
+    const isIncrementalFetch = lastMessageId != null;
+    let queryParameters = isIncrementalFetch
+      ? new HttpParams().set("fromId", lastMessageId)
+      : new HttpParams();
 
     const messages = await firstValueFrom(
-      this.HttpClient.get<Message[]>(`${environment.backendUrl}/messages`, {
+      this.httpClient.get<Message[]>(`${environment.backendUrl}/messages`, {
         params: queryParameters,
         withCredentials: true,
       })
     );
-    this.messages.next([...this.messages.value, ...messages]);
-
+    this.messages.next(
+      isIncrementalFetch ? [...this.messages.value, ...messages] : messages
+    );
   }
 
-  clear(){
+  getMessages(): Observable<Message[]> {
+    return this.messages.asObservable();
+  }
+
+  clear() {
     this.messages.next([]);
   }
-
 }
