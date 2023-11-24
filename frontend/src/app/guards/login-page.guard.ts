@@ -4,8 +4,8 @@ import { AuthenticationService } from "../login/authentication.service";
 
 export const loginPageGuard: CanActivateFn = (route, state) => {
   if (inject(AuthenticationService).isConnected()) {
-    return true;
+    return inject(Router).parseUrl("/chat");
   } else {
-    return inject(Router).parseUrl("/");
+    return true;
   }
 };
