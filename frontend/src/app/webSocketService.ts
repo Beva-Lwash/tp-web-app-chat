@@ -14,6 +14,7 @@ export class WebSocketService {
 
   constructor() {
     this.retry = false;
+    this.id = 0;
   }
 
   public connect(): Observable<WebSocketEvent> {
