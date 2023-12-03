@@ -29,12 +29,14 @@ export class ChatPageComponent implements OnInit, OnDestroy {
     private webSocketService: WebSocketService,
     private fileReaderService: FileReaderService
   ) {
+    console.log("Corps constructeur");
     this.usernameSubscription = this.username$.subscribe((u) => {
       this.username = u;
     });
   }
 
   ngOnInit() {
+    console.log("Avant connect");
     this.notifications$ = this.webSocketService.connect();
     this.notificationsSubscription = this.notifications$.subscribe(() => {
       this.messagesService.fetchMessages();
