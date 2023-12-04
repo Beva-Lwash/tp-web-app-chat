@@ -1,19 +1,23 @@
-import { HttpClientModule } from '@angular/common/http';
-import { TestBed } from '@angular/core/testing';
+import { Injectable } from "@angular/core";
+import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, Router } from "@angular/router";
+import { AuthenticationService } from "../login/authentication.service";
 
-import { ChatPageGuard } from './chat-page.guard';
+@Injectable({
+  providedIn: "root",
+})
+export class ChatPageGuard implements CanActivate {
 
-describe('ChatPageGuard', () => {
-  let guard: ChatPageGuard;
+  constructor(
+    private authService: AuthenticationService,
+    private router: Router
+  ) {}
 
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      imports: [HttpClientModule],
-    });
-    guard = TestBed.inject(ChatPageGuard);
-  });
-
-  it('should be created', () => {
-    expect(guard).toBeTruthy();
-  });
-});
+  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): boolean {
+    if (this.authService.isConnected()) {
+      return true;
+    } else {
+      this.router.navigate(["/"]); // Utilisez navigate au lieu de parseUrl pour naviguer vers la page d'accueil
+      return false;
+    }
+  }
+}
