@@ -27,4 +27,5 @@ public class FirestoreUserAccount {
     public void setEncodedPassword(String encodedPassword) {
         this.encodedPassword = encodedPassword;
     }
+
 }

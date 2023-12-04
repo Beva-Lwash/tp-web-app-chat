@@ -98,9 +98,10 @@ public class TestAuthController {
     }
 
     @Test
-    public void unexpectedExceptionAccessFirestore() {
-
-        verify(this.mockAccountRepository.getUserAccount(this.username)).thenThrow(new InterruptedException);
+    public void unexpectedExceptionAccessFirestore() throws InterruptedException, ExecutionException {
+        final Exception e = new Exception();
+        when(this.mockAccountRepository.getUserAccount(loginRequest.username())).thenThrow(e);
+        when(this.mockAccountRepository.getUserAccount(loginRequest.username())).thenThrow(new InterruptedException());
 
     }
 
