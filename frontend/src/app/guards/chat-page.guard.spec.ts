@@ -1,17 +1,19 @@
+import { HttpClientModule } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
-import { CanDeactivateFn } from '@angular/router';
 
-import { chatPageGuard } from './chat-page.guard';
+import { ChatPageGuard } from './chat-page.guard';
 
-describe('chatPageGuard', () => {
-  const executeGuard: CanDeactivateFn = (...guardParameters) => 
-      TestBed.runInInjectionContext(() => chatPageGuard(...guardParameters));
+describe('ChatPageGuard', () => {
+  let guard: ChatPageGuard;
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
+    TestBed.configureTestingModule({
+      imports: [HttpClientModule],
+    });
+    guard = TestBed.inject(ChatPageGuard);
   });
 
   it('should be created', () => {
-    expect(executeGuard).toBeTruthy();
+    expect(guard).toBeTruthy();
   });
 });

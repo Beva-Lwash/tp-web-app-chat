@@ -13,8 +13,9 @@
             name="username"
             type="text"
             formControlName="username"
+            data-testid="username-input"
           />
-          <mat-error *ngIf="showUsernameRequiredError()">Entrer votre nom d'usager svp</mat-error>
+          <mat-error data-testid="error-message" *ngIf="showUsernameRequiredError()">Entrer votre nom d'usager svp</mat-error>
         </mat-form-field>
       </div>
       <div>
@@ -25,13 +26,14 @@
             name="password"
             type="password"
             formControlName="password"
+            data-testid="password-input"
           />
-          <mat-error *ngIf="showPasswordRequiredError()">Entrer votre mot de passe svp</mat-error>
+          <mat-error data-testid="error-message" *ngIf="showPasswordRequiredError()">Entrer votre mot de passe svp</mat-error>
         </mat-form-field>
       </div>
     </div>
     <div>
-      <button mat-raised-button color="primary" type="submit">Connexion</button>
+      <button mat-raised-button color="primary" type="submit" data-testid="login-button">Connexion</button>
     </div>
   </form>
 </div>

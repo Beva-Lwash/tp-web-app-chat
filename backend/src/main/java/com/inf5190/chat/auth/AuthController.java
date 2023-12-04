@@ -1,6 +1,5 @@
 package com.inf5190.chat.auth;
 
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.http.HttpHeaders;
@@ -41,23 +40,28 @@ public class AuthController {
     }
 
     @PostMapping(AUTH_LOGIN_PATH)
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest)
-            throws InterruptedException, ExecutionException {
-        FirestoreUserAccount account = this.userAccountRepository.getUserAccount(loginRequest.username());
-        if (account == null) {
-            String encodedPassword = this.passwordEncoder.encode(loginRequest.password());
-            this.userAccountRepository
-                    .createUserAccount(new FirestoreUserAccount(loginRequest.username(), encodedPassword));
-        } else if (!this.passwordEncoder.matches(loginRequest.password(), account.getEncodedPassword())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest loginRequest) {
+        try {
+            FirestoreUserAccount account = this.userAccountRepository.getUserAccount(loginRequest.username());
+            if (account == null) {
+                String encodedPassword = this.passwordEncoder.encode(loginRequest.password());
+                this.userAccountRepository
+                        .createUserAccount(new FirestoreUserAccount(loginRequest.username(), encodedPassword));
+            } else if (!this.passwordEncoder.matches(loginRequest.password(), account.getEncodedPassword())) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+            }
+
+            String sessionId = this.sessionManager.addSession(new SessionData(loginRequest.username()));
+
+            ResponseCookie sessionCookie = this.createResponseSessionCookie(sessionId, TimeUnit.DAYS.toSeconds(1));
+
+            return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, sessionCookie.toString())
+                    .body(new LoginResponse(loginRequest.username()));
+        } catch (ResponseStatusException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected error on login.");
         }
-
-        String sessionId = this.sessionManager.addSession(new SessionData(loginRequest.username()));
-
-        ResponseCookie sessionCookie = this.createResponseSessionCookie(sessionId, TimeUnit.DAYS.toSeconds(1));
-
-        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, sessionCookie.toString())
-                .body(new LoginResponse(loginRequest.username()));
     }
 
     @PostMapping(AUTH_LOGOUT_PATH)
