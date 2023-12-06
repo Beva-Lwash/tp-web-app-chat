@@ -89,52 +89,132 @@ public class ITestMessageController {
     }
 
     @Test
+    public void postMessageNotLoggedIn() {
+        ResponseEntity<String> response = this.restTemplate.postForEntity(this.messagesEndpointUrl,
+                new NewMessageRequest("username", "text", null), String.class);
+
+        assertThat(response.getStatusCodeValue()).isEqualTo(403);
+    }
+
+    @Test
+    public void postMessage() {
+        final String sessionCookie = this.login();
+
+        final HttpEntity<NewMessageRequest> request = this
+                .createRequestEntityWithSessionCookie(new NewMessageRequest("username", "text", null), sessionCookie);
+        final ResponseEntity<Message> response = this.restTemplate.postForEntity(this.messagesEndpointUrl,
+                request, Message.class);
+
+        assertThat(response.getStatusCodeValue()).isEqualTo(200);
+
+        final Message actualMessage = response.getBody();
+        assertThat(actualMessage.id()).isNotEmpty();
+        assertThat(actualMessage.username()).isEqualTo("username");
+        assertThat(actualMessage.text()).isEqualTo("text");
+        assertThat(actualMessage.imageUrl()).isNull();
+    }
+
+    @Test
+    public void postMessageInvalidUsername() {
+        final String sessionCookie = this.login();
+
+        final HttpEntity<NewMessageRequest> request = this
+                .createRequestEntityWithSessionCookie(new NewMessageRequest("not_username", "text", null),
+                        sessionCookie);
+        final ResponseEntity<String> response = this.restTemplate.postForEntity(this.messagesEndpointUrl,
+                request, String.class);
+
+        assertThat(response.getStatusCodeValue()).isEqualTo(403);
+    }
+
+    @Test
     public void getMessages() {
         final String sessionCookie = this.login();
 
         final HttpHeaders header = this.createHeadersWithSessionCookie(sessionCookie);
-        final HttpEntity<Object> headers = new HttpEntity<>(header);
+        final HttpEntity<Object> headers = new HttpEntity<Object>(header);
         final ResponseEntity<Message[]> response = this.restTemplate.exchange(this.messagesEndpointUrl,
                 HttpMethod.GET, headers, Message[].class);
 
-        // À compléter
-        assertResponseIsSuccessful(response);
+        assertThat(response.getStatusCodeValue()).isEqualTo(200);
 
         final Message[] actualMessages = response.getBody();
-        assertMessages(actualMessages, "1", message1, "2", message2);
+        assertThat(actualMessages.length).isEqualTo(2);
+
+        final Message m1 = actualMessages[0];
+        assertThat(m1.id()).isEqualTo("1");
+        assertThat(m1.username()).isEqualTo(this.message1.getUsername());
+        assertThat(m1.text()).isEqualTo(this.message1.getText());
+        assertThat(m1.imageUrl()).isNull();
+
+        final Message m2 = actualMessages[1];
+        assertThat(m2.id()).isEqualTo("2");
+        assertThat(m2.username()).isEqualTo(this.message2.getUsername());
+        assertThat(m2.text()).isEqualTo(this.message2.getText());
+        assertThat(m2.imageUrl()).isNull();
     }
-    private void assertResponseIsSuccessful(ResponseEntity<?> response) {
-    assertThat(response.getStatusCodeValue()).as("HTTP status code should be 2xx").isBetween(200, 299);
-}
 
-
-// Méthode utilitaire pour vérifier une liste de messages
-private void assertMessages(Message[] actualMessages, Object... expectedMessages) {
-        assertThat(actualMessages.length).isEqualTo(expectedMessages.length / 4);
-    
-        for (int i = 0; i < actualMessages.length; i++) {
-            int index = i * 4;
-            assertMessage(
-                actualMessages[i],
-                expectedMessages[index],               
-                new FirestoreMessage(expectedMessages[index + 1].toString(), Timestamp.now(), expectedMessages[index + 2].toString(), null),  // FirestoreMessage
-                expectedMessages[index + 3].toString(), 
-                null                                   
-            );
+    @Test
+    public void getMessagesWithMoreThanTwentyMessages() throws InterruptedException, ExecutionException {
+        for (int i = 11; i <= 30; i++) {
+            this.firestore.collection("messages").document(Integer.toString(i))
+                    .create(new FirestoreMessage("u" + i, Timestamp.now(), "t" + i, null)).get();
         }
-    }
-    
-    // Méthode utilitaire pour vérifier un message
-    private void assertMessage(Message actual, Object expectedId, FirestoreMessage expectedFirestoreMessage,
-            String expectedUsername, String expectedText) {
-        assertThat(actual).isNotNull();
-        assertThat(actual.id()).isEqualTo(expectedId);
-        assertThat(actual.username()).isEqualTo(expectedUsername);
-        assertThat(actual.text()).isEqualTo(expectedText);
-        assertThat(actual.imageUrl()).isNull();
-    }
-    
 
+        final String sessionCookie = this.login();
+
+        final HttpHeaders header = this.createHeadersWithSessionCookie(sessionCookie);
+        final HttpEntity<Object> headers = new HttpEntity<Object>(header);
+        final ResponseEntity<Message[]> response = this.restTemplate.exchange(this.messagesEndpointUrl,
+                HttpMethod.GET, headers, Message[].class);
+
+        assertThat(response.getStatusCodeValue()).isEqualTo(200);
+
+        final Message[] actualMessages = response.getBody();
+        assertThat(actualMessages.length).isEqualTo(20);
+
+        final Message m1 = actualMessages[0];
+        assertThat(m1.id()).isEqualTo("11");
+
+        final Message m2 = actualMessages[actualMessages.length - 1];
+        assertThat(m2.id()).isEqualTo("30");
+
+    }
+
+    @Test
+    public void getMessagesWithFromId() {
+        final String sessionCookie = this.login();
+
+        final HttpHeaders header = this.createHeadersWithSessionCookie(sessionCookie);
+        final HttpEntity<Object> headers = new HttpEntity<Object>(header);
+        final ResponseEntity<Message[]> response = this.restTemplate.exchange(
+                this.messagesEndpointUrl + "?fromId=1",
+                HttpMethod.GET, headers, Message[].class);
+
+        assertThat(response.getStatusCodeValue()).isEqualTo(200);
+
+        final Message[] actualMessages = response.getBody();
+        assertThat(actualMessages.length).isEqualTo(1);
+
+        final Message m1 = actualMessages[0];
+        assertThat(m1.id()).isEqualTo("2");
+        assertThat(m1.username()).isEqualTo(this.message2.getUsername());
+        assertThat(m1.text()).isEqualTo(this.message2.getText());
+        assertThat(m1.imageUrl()).isNull();
+    }
+
+    @Test
+    public void getMessagesWithFromIdInvalid() {
+        final String sessionCookie = this.login();
+
+        final HttpHeaders header = this.createHeadersWithSessionCookie(sessionCookie);
+        final HttpEntity<Object> headers = new HttpEntity<Object>(header);
+        final ResponseEntity<String> response = this.restTemplate.exchange(
+                this.messagesEndpointUrl + "?fromId=AAA",
+                HttpMethod.GET, headers, String.class);
+
+        assertThat(response.getStatusCodeValue()).isEqualTo(404);
+    }
 
     /**
      * Se connecte et retourne le cookie de session.
@@ -153,7 +233,9 @@ private void assertMessages(Message[] actualMessages, Object... expectedMessages
     private HttpEntity<NewMessageRequest> createRequestEntityWithSessionCookie(NewMessageRequest messageRequest,
             String cookieValue) {
         HttpHeaders header = this.createHeadersWithSessionCookie(cookieValue);
-        return new HttpEntity<NewMessageRequest>(messageRequest, header);
+        return new HttpEntity<NewMessageRequest>(
+                messageRequest,
+                header);
     }
 
     private HttpHeaders createHeadersWithSessionCookie(String cookieValue) {
@@ -172,8 +254,8 @@ private void assertMessages(Message[] actualMessages, Object... expectedMessages
             System.err.println(
                     "**********************************************************************************************************");
         }
-        assertThat(firebaseEmulator)
-                .as("You need to set FIRESTORE_EMULATOR_HOST=localhost:8181 in your system properties.")
+        assertThat(firebaseEmulator).as(
+                "You need to set FIRESTORE_EMULATOR_HOST=localhost:8181 in your system properties.")
                 .isNotEmpty();
         final String storageEmulator = System.getenv().get("FIREBASE_STORAGE_EMULATOR_HOST");
         if (storageEmulator == null || storageEmulator.length() == 0) {
@@ -184,8 +266,8 @@ private void assertMessages(Message[] actualMessages, Object... expectedMessages
             System.err.println(
                     "**********************************************************************************************************");
         }
-        assertThat(storageEmulator)
-                .as("You need to set FIREBASE_STORAGE_EMULATOR_HOST=localhost:9199 in your system properties.")
+        assertThat(storageEmulator).as(
+                "You need to set FIREBASE_STORAGE_EMULATOR_HOST=localhost:9199 in your system properties.")
                 .isNotEmpty();
     }
 }

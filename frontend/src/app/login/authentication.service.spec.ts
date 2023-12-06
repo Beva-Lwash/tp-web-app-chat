@@ -43,24 +43,23 @@ describe("AuthenticationService", () => {
       await loginPromise;
     });
 
-    it('should save and emit the username', async () => {
+    it("should store and emit the username", async () => {
       expect(await firstValueFrom(service.getUsername())).toBeNull();
 
       const loginPromise = service.login(loginData);
 
       const req = httpTestingController.expectOne(
-        'http://localhost:8080/auth/login'
+        `${environment.backendUrl}/auth/login`
       );
-      req.flush({ username: loginData.username  });
+      req.flush({ username: loginData.username });
 
       await loginPromise;
 
       expect(await firstValueFrom(service.getUsername())).toEqual(
         loginData.username
       );
-      expect(localStorage.getItem('username')).toEqual(loginData.username);
+      expect(localStorage.getItem("username")).toEqual(loginData.username);
     });
-      
   });
 
   describe("on logout", () => {
@@ -73,13 +72,12 @@ describe("AuthenticationService", () => {
     });
 
     it("should call POST with login data to auth/logout", async () => {
-      // À compléter
       const logoutPromise = service.logout();
 
       const req = httpTestingController.expectOne(
-        'http://localhost:8080/auth/logout'
+        `${environment.backendUrl}/auth/logout`
       );
-      expect(req.request.method).toBe('POST');
+      expect(req.request.method).toBe("POST");
       req.flush({});
 
       // wait for the logout to complete
@@ -87,26 +85,21 @@ describe("AuthenticationService", () => {
     });
 
     it("should remove the username from the service and local storage", async () => {
-      // À compléter
       expect(await firstValueFrom(service.getUsername())).toEqual(
         loginData.username
       );
-      expect(localStorage.getItem("username")).toEqual(loginData.username);
-    
+
       const logoutPromise = service.logout();
-    
+
       const req = httpTestingController.expectOne(
-        "http://localhost:8080/auth/logout"
+        `${environment.backendUrl}/auth/logout`
       );
       req.flush({});
-    
-      // Wait for the logout to complete
+
       await logoutPromise;
-    
-      // Check if username is removed
+
       expect(await firstValueFrom(service.getUsername())).toBeNull();
       expect(localStorage.getItem("username")).toBeNull();
-      
     });
   });
 });
