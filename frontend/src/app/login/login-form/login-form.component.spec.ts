@@ -121,7 +121,7 @@ describe("LoginFormComponent", () => {
 
     fixture.detectChanges();
 
-    const errorMessage = testHelper.getElement("username-error");
+    const errorMessage = testHelper.getElement("error-message");
     expect(errorMessage).toBeDefined();
   });
 
@@ -132,7 +132,7 @@ describe("LoginFormComponent", () => {
 
     fixture.detectChanges();
 
-    const errorMessage = testHelper.getElement("password-error");
+    const errorMessage = testHelper.getElement("error-message");
     expect(errorMessage).toBeDefined();
   });
 

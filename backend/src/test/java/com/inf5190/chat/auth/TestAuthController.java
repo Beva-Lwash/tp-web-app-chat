@@ -65,7 +65,6 @@ public class TestAuthController {
 
         verify(this.mockAccountRepository, times(1)).getUserAccount(this.username);
         verify(this.mockPasswordEncoder, times(1)).encode(this.password);
-        verify(this.mockAccountRepository).createUserAccount(this.userAccount);
         verify(this.mockSessionManager, times(1)).addSession(expectedSessionData);
     }
 

@@ -2,7 +2,6 @@ package com.inf5190.chat.websocket.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
@@ -34,6 +33,6 @@ public class WebSocketConfig implements WebSocketConfigurer {
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         // Enregistre le handler pour chaque connexion websocket.
         registry.addHandler(new WebSocketHandler(this.webSocketManager), "/notifications")
-                .setAllowedOriginPatterns(this.allowedOrigins.split(","));
+                .setAllowedOriginPatterns(this.allowedOrigins);
     }
 }
