@@ -1,8 +1,10 @@
 package com.inf5190.chat;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Optional;
 
 import javax.annotation.PostConstruct;
 
@@ -48,27 +50,6 @@ public class ChatApplication {
         SpringApplication.run(ChatApplication.class, args);
     }
 
-    @PostConstruct
-    public void initialiseFirebase() {
-        try {
-            if (FirebaseApp.getApps().size() == 0) {
-                FileInputStream serviceAccount = new FileInputStream("firebase-key.json");
-
-                FirebaseOptions options = FirebaseOptions.builder()
-                        .setProjectId(this.firebaseProjectId)
-                        .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-                        .build();
-
-                LOGGER.info("Initializing Firebase application.");
-                FirebaseApp.initializeApp(options);
-            } else {
-                LOGGER.info("Firebase application already initialized.");
-            }
-        } catch (IOException e) {
-            LOGGER.error("**** Could not initialise application. Please check you service account key path. ****");
-        }
-    }
-
     @Bean
     public Firestore getFirestore() {
         return FirestoreClient.getFirestore();
@@ -96,5 +77,49 @@ public class ChatApplication {
     @Bean
     public PasswordEncoder getPasswordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Value("${cors.allowedOrigins}")
+    private String allowedOriginsProperty;
+
+    @Value("${firebase.storage.bucket.name}")
+    private String storageBucketNameProperty;
+
+    @PostConstruct
+    public void initialiseFirebase() throws IOException {
+        if (FirebaseApp.getApps().size() == 0) {
+
+            String projectId = Optional.ofNullable(System.getenv("GOOGLE_CLOUD_PROJECT"))
+                    .orElse(this.firebaseProjectId);
+
+            final FirebaseOptions.Builder optionsBuilder = FirebaseOptions.builder()
+                    .setProjectId(projectId);
+
+            File f = new File("firebase-key.json");
+            if (f.exists()) {
+                FileInputStream serviceAccount = new FileInputStream("firebase-key.json");
+                optionsBuilder.setCredentials(GoogleCredentials.fromStream(serviceAccount));
+            } else {
+                optionsBuilder.setCredentials(GoogleCredentials.getApplicationDefault());
+            }
+
+            LOGGER.info("Initializing Firebase application.");
+            FirebaseApp.initializeApp(optionsBuilder.build());
+
+        } else {
+            LOGGER.info("Firebase application already initialized.");
+        }
+    }
+
+    @Bean("allowedOrigins")
+    public String[] getAllowedOrigins() {
+        return Optional.ofNullable(System.getenv("ALLOWED_ORIGINS"))
+                .orElse(this.allowedOriginsProperty).split(",");
+    }
+
+    @Bean("storageBucketName")
+    public String getStorageBucketName() {
+        return Optional.ofNullable(System.getenv("STORAGE_BUCKET_NAME"))
+                .orElse(this.storageBucketNameProperty);
     }
 }
