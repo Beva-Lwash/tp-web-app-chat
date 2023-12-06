@@ -77,8 +77,23 @@ export class ChatPageComponent implements OnInit, OnDestroy {
   }
 
   async onLogout() {
-    this.messagesService.clear();
-    await this.authenticationService.logout();
-    this.router.navigate(["/"]);
+    try {
+      await this.authenticationService.logout();
+    } finally {
+      this.messagesService.clear();
+      this.router.navigate(["/"]);
+    }
+  }
+
+  private async fetchMessages() {
+    try {
+      await this.messagesService.fetchMessages();
+    } catch (error) {
+      if (error instanceof HttpErrorResponse && error.status === 403) {
+        await this.onLogout();
+      } else {
+        console.error("Impossible de charger les messages.");
+      }
+    }
   }
 }
