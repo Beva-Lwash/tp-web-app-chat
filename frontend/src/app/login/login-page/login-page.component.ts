@@ -10,33 +10,25 @@ import { HttpErrorResponse } from "@angular/common/http";
   styleUrls: ["./login-page.component.css"],
 })
 export class LoginPageComponent implements OnInit {
+  loginErrorMessage: string | null = null;
+
   constructor(
     private authenticationService: AuthenticationService,
     private router: Router
   ) {}
 
-  errorPresent = false;
-  errorMessage = "";
-
-  ngOnInit(): void {
-    this.errorPresent = false;
-  }
+  ngOnInit(): void {}
 
   async onLogin(userCredentials: UserCredentials) {
+    this.loginErrorMessage = null;
     try {
       await this.authenticationService.login(userCredentials);
       this.router.navigate(["/chat"]);
-    } catch (e) {
-      this.errorPresent = true;
-      if (e instanceof HttpErrorResponse && e.status == 403) {
-        this.errorMessage = "Mot de pass invalide!";
-        console.log(this.errorMessage);
+    } catch (error) {
+      if (error instanceof HttpErrorResponse && error.status === 403) {
+        this.loginErrorMessage = "Mot de passe invalide";
       } else {
-        e = new Error("Problème de connexion");
-        if (e instanceof Error) {
-          this.errorMessage = e.message;
-          console.log(this.errorMessage);
-        }
+        this.loginErrorMessage = "Problème de connexion";
       }
     }
   }

@@ -33,6 +33,6 @@ public class WebSocketConfig implements WebSocketConfigurer {
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         // Enregistre le handler pour chaque connexion websocket.
         registry.addHandler(new WebSocketHandler(this.webSocketManager), "/notifications")
-                .setAllowedOriginPatterns(this.allowedOrigins);
+                .setAllowedOriginPatterns(allowedOrigins);
     }
 }
