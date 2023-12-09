@@ -32,7 +32,6 @@ export class NewMessageFormComponent {
       this.messageForm.reset();
       this.file = null;
     }
-    console.log("Message Send");
   }
 
   fileChanged(event: any) {

@@ -1,19 +1,17 @@
-import { HttpClientModule } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
+import { CanActivateFn } from '@angular/router';
 
-import { ChatPageGuard } from './chat-page.guard';
+import { chatPageGuard } from './chat-page.guard';
 
-describe('ChatPageGuard', () => {
-  let guard: ChatPageGuard;
+describe('chatPageGuard', () => {
+  const executeGuard: CanActivateFn = (...guardParameters) => 
+      TestBed.runInInjectionContext(() => chatPageGuard(...guardParameters));
 
   beforeEach(() => {
-    TestBed.configureTestingModule({
-      imports: [HttpClientModule],
-    });
-    guard = TestBed.inject(ChatPageGuard);
+    TestBed.configureTestingModule({});
   });
 
   it('should be created', () => {
-    expect(guard).toBeTruthy();
+    expect(executeGuard).toBeTruthy();
   });
 });

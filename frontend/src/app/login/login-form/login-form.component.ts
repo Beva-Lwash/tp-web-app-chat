@@ -1,5 +1,5 @@
 import { Component, EventEmitter, OnInit, Output } from "@angular/core";
-import { FormBuilder, FormGroupDirective, Validators } from "@angular/forms";
+import { FormBuilder, Validators } from "@angular/forms";
 import { UserCredentials } from "../model/user-credentials";
 
 @Component({
@@ -9,8 +9,8 @@ import { UserCredentials } from "../model/user-credentials";
 })
 export class LoginFormComponent implements OnInit {
   loginForm = this.fb.group({
-    username: [null, [Validators.required]],
-    password: [null, [Validators.required]],
+    username: ["", Validators.required],
+    password: ["", Validators.required],
   });
 
   @Output()
@@ -19,14 +19,6 @@ export class LoginFormComponent implements OnInit {
   constructor(private fb: FormBuilder) {}
 
   ngOnInit(): void {}
-
-  showUsernameRequiredError(): boolean {
-    return this.showError("username", "required");
-  }
-
-  showPasswordRequiredError(): boolean {
-    return this.showError("password", "required");
-  }
 
   onLogin() {
     if (
@@ -43,11 +35,19 @@ export class LoginFormComponent implements OnInit {
     }
   }
 
-  private showError(field: "password" | "username", error: string): boolean {
+  showMissingUsername() {
+    return this.showMissing("username");
+  }
+
+  showMissingPassword() {
+    return this.showMissing("password");
+  }
+
+  private showMissing(controlName: string) {
     return (
-      this.loginForm.controls[field].hasError(error) &&
-      (this.loginForm.controls[field].dirty ||
-        this.loginForm.controls[field].touched)
+      this.loginForm.get(controlName)?.hasError("required") &&
+      (this.loginForm.get(controlName)?.dirty ||
+        this.loginForm.get(controlName)?.touched)
     );
   }
 }

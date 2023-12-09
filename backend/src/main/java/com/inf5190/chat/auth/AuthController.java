@@ -66,9 +66,15 @@ public class AuthController {
 
     @PostMapping(AUTH_LOGOUT_PATH)
     public ResponseEntity<Void> logout() {
-        ResponseCookie deleteSessionCookie = this.createResponseSessionCookie(null, 0);
-        return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, deleteSessionCookie.toString()).body(null);
+        try {
+            ResponseCookie deleteSessionCookie = this.createResponseSessionCookie(null, 0);
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.SET_COOKIE, deleteSessionCookie.toString()).body(null);
+        } catch (ResponseStatusException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected error on login.");
+        }
 
     }
 
@@ -77,7 +83,8 @@ public class AuthController {
                 .path("/")
                 .httpOnly(true)
                 .secure(true)
-                .maxAge(maxAge).sameSite("None")
+                .maxAge(maxAge)
+                .sameSite("None")
                 .build();
     }
 }

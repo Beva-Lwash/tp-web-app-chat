@@ -1,6 +1,4 @@
 <div>
   <app-login-form (login)="onLogin($event)"></app-login-form>
-  <div id="error" *ngIf="loginErrorMessage">
-    <p>{{loginErrorMessage}}</p>
-  </div>
+  <h3 *ngIf="loginErrorMessage" class="error">{{ loginErrorMessage }}</h3>
 </div>

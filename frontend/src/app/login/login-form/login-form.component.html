@@ -1,39 +1,38 @@
 <div>
-  <form 
-  #formDirective="ngForm"
-  class="form" 
-  (ngSubmit)="onLogin()" 
-  [formGroup]="loginForm">
-    <div>
-      <div>
-        <mat-form-field>
-          <mat-label>Nom d'usager</mat-label>
-          <input
-            matInput
-            name="username"
-            type="text"
-            formControlName="username"
-            data-testid="username-input"
-          />
-          <mat-error data-testid="error-message" *ngIf="showUsernameRequiredError()">Entrer votre nom d'usager svp</mat-error>
-        </mat-form-field>
-      </div>
-      <div>
-        <mat-form-field>
-          <mat-label>Mot de passe</mat-label>
-          <input
-            matInput
-            name="password"
-            type="password"
-            formControlName="password"
-            data-testid="password-input"
-          />
-          <mat-error data-testid="error-message" *ngIf="showPasswordRequiredError()">Entrer votre mot de passe svp</mat-error>
-        </mat-form-field>
-      </div>
-    </div>
-    <div>
-      <button mat-raised-button color="primary" type="submit" data-testid="login-button">Connexion</button>
-    </div>
+  <form class="form" (ngSubmit)="onLogin()" [formGroup]="loginForm">
+    <mat-form-field>
+      <mat-label>Nom d'usager</mat-label>
+      <input
+        matInput
+        name="username"
+        type="text"
+        formControlName="username"
+        data-testid="username-input"
+      />
+      <mat-error *ngIf="showMissingUsername()" data-testid="username-error"
+        >Entrer un nom d'utilisateur</mat-error
+      >
+    </mat-form-field>
+    <mat-form-field>
+      <mat-label>Mot de passe</mat-label>
+      <input
+        matInput
+        name="password"
+        type="password"
+        formControlName="password"
+        data-testid="password-input"
+      />
+      <mat-error *ngIf="showMissingPassword()" data-testid="password-error"
+        >Entrer un mot de passe</mat-error
+      >
+    </mat-form-field>
+    <button
+      mat-raised-button
+      color="primary"
+      type="submit"
+      data-testid="login-button"
+    >
+      Connexion
+    </button>
   </form>
 </div>

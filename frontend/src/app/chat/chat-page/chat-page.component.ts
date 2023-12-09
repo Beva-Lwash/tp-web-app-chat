@@ -29,19 +29,17 @@ export class ChatPageComponent implements OnInit, OnDestroy {
     private webSocketService: WebSocketService,
     private fileReaderService: FileReaderService
   ) {
-    console.log("Corps constructeur");
     this.usernameSubscription = this.username$.subscribe((u) => {
       this.username = u;
     });
   }
 
   ngOnInit() {
-    console.log("Avant connect");
     this.notifications$ = this.webSocketService.connect();
     this.notificationsSubscription = this.notifications$.subscribe(() => {
-      this.messagesService.fetchMessages();
+      this.fetchMessages();
     });
-    this.messagesService.fetchMessages();
+    this.fetchMessages();
   }
 
   ngOnDestroy(): void {
@@ -67,10 +65,11 @@ export class ChatPageComponent implements OnInit, OnDestroy {
           username: this.username,
           imageData: imageData,
         });
-      } catch (e) {
-        if (e instanceof HttpErrorResponse && e.status == 403) {
-          await this.authenticationService.logout();
-          this.router.navigate(["/"]);
+      } catch (error) {
+        if (error instanceof HttpErrorResponse && error.status === 403) {
+          await this.onLogout();
+        } else {
+          console.error("Impossible d'envoyer le message.");
         }
       }
     }

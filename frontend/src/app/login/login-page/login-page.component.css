@@ -1,5 +1,9 @@
-#error{
-text-align: center;
-color: red;
-padding-top: 10%;
+.error {
+  color: red;
+}
+
+div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }

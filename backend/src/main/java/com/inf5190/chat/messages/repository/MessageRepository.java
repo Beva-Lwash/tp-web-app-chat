@@ -12,18 +12,13 @@ import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.Query;
-import com.google.firebase.cloud.FirestoreClient;
 
 import com.inf5190.chat.messages.model.Message;
 import com.inf5190.chat.messages.model.NewMessageRequest;
 
 import io.jsonwebtoken.io.Decoders;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
-import org.springframework.web.server.ResponseStatusException;
 
 /**
  * Classe qui gère la persistence des messages.
@@ -32,14 +27,17 @@ import org.springframework.web.server.ResponseStatusException;
  */
 @Repository
 public class MessageRepository {
-    @Autowired
-    @Qualifier("storageBucketName")
-    private String storageBucketName;
-
     private static final String COLLECTION_NAME = "messages";
+    private static final String BUCKET_NAME = "app-chat-a23.appspot.com";
     private static final int DEFAULT_LIMIT = 20;
 
-    private final Firestore firestore = FirestoreClient.getFirestore();
+    private final Firestore firestore;
+    private final StorageClient storageClient;
+
+    public MessageRepository(Firestore firestore, StorageClient storageClient) {
+        this.firestore = firestore;
+        this.storageClient = storageClient;
+    }
 
     public List<Message> getMessages(String fromId) throws InterruptedException, ExecutionException {
         Query messageQuery = this.firestore.collection(COLLECTION_NAME).orderBy("timestamp");
@@ -47,7 +45,7 @@ public class MessageRepository {
         if (fromId != null) {
             DocumentSnapshot fromIdDocument = this.firestore.collection(COLLECTION_NAME).document(fromId).get().get();
             if (!fromIdDocument.exists()) {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Message with id " + fromId + " not found.");
+                throw new DocumentNotFoundException("Document with id " + fromId + " not found.");
             }
             messageQuery = messageQuery.startAfter(fromIdDocument);
         } else {
@@ -64,11 +62,11 @@ public class MessageRepository {
 
         String imageUrl = null;
         if (message.imageData() != null) {
-            Bucket b = StorageClient.getInstance().bucket(storageBucketName);
+            Bucket b = this.storageClient.bucket(BUCKET_NAME);
             String path = String.format("images/%s.%s", ref.getId(), message.imageData().type());
             b.create(path, Decoders.BASE64.decode(message.imageData().data()),
                     BlobTargetOption.predefinedAcl(PredefinedAcl.PUBLIC_READ));
-            imageUrl = String.format("https://storage.googleapis.com/%s/%s", storageBucketName, path);
+            imageUrl = String.format("https://storage.googleapis.com/%s/%s", BUCKET_NAME, path);
         }
 
         FirestoreMessage firestoreMessage = new FirestoreMessage(
