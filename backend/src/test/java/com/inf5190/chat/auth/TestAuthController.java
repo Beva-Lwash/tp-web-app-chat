@@ -92,19 +92,16 @@ public class TestAuthController {
         when(this.mockAccountRepository.getUserAccount(loginRequest.username())).thenReturn(userAccount);
         when(this.mockPasswordEncoder.matches(loginRequest.password(), this.hashedPassword)).thenReturn(false);
 
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class,
-                () -> this.authController.login(loginRequest));
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> this.authController.login(loginRequest));
 
         assertThat(exception.getRawStatusCode()).isEqualTo(403);
     }
 
     @Test
     public void loginUnexpectedException() throws InterruptedException, ExecutionException {
-        when(this.mockAccountRepository.getUserAccount(loginRequest.username()))
-                .thenThrow(new RuntimeException("erreur"));
+        when(this.mockAccountRepository.getUserAccount(loginRequest.username())).thenThrow(new RuntimeException("erreur"));
 
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class,
-                () -> this.authController.login(loginRequest));
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> this.authController.login(loginRequest));
 
         assertThat(exception.getRawStatusCode()).isEqualTo(500);
     }
