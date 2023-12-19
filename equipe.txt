@@ -1,2 +1,4 @@
 Mehdi Bennani (BENM19029207)
 Ama Seye    (SEYA06019603)
+
+Adresse de l'aplication web : https://inf5190-chat-8aa2a.web.app
